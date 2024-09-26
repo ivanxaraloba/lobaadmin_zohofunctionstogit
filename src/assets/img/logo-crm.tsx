@@ -1,12 +1,12 @@
 import React from "react";
 
-export default function LogoCrm() {
+export default function LogoCrm({ size = 20 }: any) {
   return (
     <svg
       version="1.0"
       xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
+      width={size}
+      height={size}
       viewBox="0 0 256.000000 256.000000"
       preserveAspectRatio="xMidYMid meet"
       className="fill-current stroke-current text-black dark:text-white dark:stroke-gray-400"

@@ -1,42 +1,48 @@
+import { format } from "date-fns";
+import { useMutation } from "@tanstack/react-query";
 import {
   bitbucketCommit,
   bitbucketCreateRepository,
   bitbucketGetRepository,
 } from "@/helpers/bitbucket";
-import { useMutation } from "@tanstack/react-query";
-import { format } from "date-fns";
 import { toast } from "sonner";
+import { useGlobalStore } from "@/stores/global";
 
-const usePushToGit = (
-  projectKey: string,
-  functions: any[],
-  pathPrefix: string
-) => {
+interface UsePushToGitParams {
+  project: any;
+  data: { folder: string; script: string }[];
+  message: string;
+}
+
+export const usePushToGit = ({
+  project,
+  data,
+  message,
+}: UsePushToGitParams) => {
+  const { user } = useGlobalStore();
+
+  const name = `loba-projects_${project?.username}`;
+  const auth = {
+    username: user?.profile?.bbUsername,
+    password: user?.profile?.bbPassword,
+  };
+
   return useMutation({
     mutationFn: async () => {
-      const name = `loba-projects_${projectKey}`;
-
-      let repository = await bitbucketGetRepository(name);
-      if (!repository) repository = await bitbucketCreateRepository(name);
+      let repository = await bitbucketGetRepository(auth, name);
+      if (!repository) repository = await bitbucketCreateRepository(auth, name);
 
       const formData = new FormData();
-      functions.forEach((func) => {
-        formData.append(
-          `${pathPrefix}/${func.display_name || func.WFName}.dg`,
-          func.workflow || func.script
-        );
+      data.forEach(({ folder, script }) => {
+        formData.append(folder, script);
       });
 
-      await bitbucketCommit(
-        name,
-        formData,
-        format(new Date(), "dd-MM-yyyy HH:mm:ss")
-      );
+      await bitbucketCommit(auth, name, formData, message);
     },
     onSuccess: () => {
       toast.success("Functions pushed successfully");
     },
-    onError: (err) => {
+    onError: (err: any) => {
       toast.error(err.message || "Error pushing to git");
     },
   });

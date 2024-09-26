@@ -36,6 +36,7 @@ import Description from "@/components/ui/description";
 import { time } from "@/utils/generic";
 import { format } from "date-fns";
 import { useGlobalStore } from "@/stores/global";
+import { PushToGitButton } from "@/components/shared/button-push-to-git";
 
 export default function Page({ params }: { params: { username: string } }) {
   const { username } = params;
@@ -83,41 +84,6 @@ export default function Page({ params }: { params: { username: string } }) {
     },
   });
 
-  const mutationPushToGit = useMutation({
-    mutationFn: async () => {
-      const name = `loba-projects_${project?.username}`;
-
-      const auth = {
-        username: user?.profile?.bbUsername,
-        password: user?.profile?.bbPassword,
-      };
-
-      let repository = await bitbucketGetRepository(auth, name);
-      if (!repository) repository = await bitbucketCreateRepository(auth, name);
-
-      const formData = new FormData();
-      project?.recruit?.functions.forEach((func) => {
-        formData.append(
-          `recruit/functions/${func.display_name}.dg`,
-          func.workflow
-        );
-      });
-
-      await bitbucketCommit(
-        auth,
-        name,
-        formData,
-        format(new Date(), "dd-MM-yyyy HH:mm:ss")
-      );
-    },
-    onSuccess: () => {
-      toast.success("Functions pushed successfully");
-    },
-    onError: (err) => {
-      toast.error(err.message || "Error pushing to git");
-    },
-  });
-
   const { data, filters, setFilters } = useSearch(
     project?.recruit?.functions || [],
     "script",
@@ -142,14 +108,13 @@ export default function Page({ params }: { params: { username: string } }) {
               </Description>
             </div>
             <div className="ml-auto flex items-center gap-3">
-              <ButtonLoading
-                variant="secondary"
-                icon={ArrowUpFromLine}
-                loading={mutationPushToGit.isPending}
-                onClick={() => mutationPushToGit.mutate()}
-              >
-                <span>Push to Git</span>
-              </ButtonLoading>
+              <PushToGitButton
+                project={project}
+                data={project?.recruit?.functions?.map((func: any) => ({
+                  folder: `recruit/functions/${func.display_name}.dg`,
+                  script: func.workflow,
+                }))}
+              />
               <ButtonLoading
                 icon={RefreshCcw}
                 loading={mutationRefresh.isPending}

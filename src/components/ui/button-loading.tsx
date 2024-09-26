@@ -15,7 +15,7 @@ const ButtonLoading: React.FC<ButtonLoadingProps> = ({
   ...props
 }) => {
   return (
-    <Button {...props} disabled={loading}>
+    <Button {...props} disabled={loading || props.disabled}>
       <div className={cn("flex items-center gap-2")}>
         {children}
         {loading ? (

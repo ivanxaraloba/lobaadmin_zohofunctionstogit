@@ -37,6 +37,15 @@ import {
 } from "@/helpers/bitbucket";
 import { format } from "date-fns";
 import { useGlobalStore } from "@/stores/global";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { PushToGitButton } from "@/components/shared/button-push-to-git";
 
 export default function Page({ params }: { params: { username: string } }) {
   const router = useRouter();
@@ -146,42 +155,6 @@ export default function Page({ params }: { params: { username: string } }) {
     },
   });
 
-  const mutationPushToGit = useMutation({
-    mutationFn: async () => {
-      const name = `loba-projects_${project?.username}`;
-
-      const auth = {
-        username: user?.profile?.bbUsername,
-        password: user?.profile?.bbPassword,
-      };
-
-      let repository = await bitbucketGetRepository(auth, name);
-      if (!repository) repository = await bitbucketCreateRepository(auth, name);
-
-      const workflows = app?.accordian.flatMap(
-        (form: any) => form.workflows ?? []
-      );
-
-      const formData = new FormData();
-      workflows.forEach((func: any) => {
-        formData.append(`creator/workflows/${func.WFName}.dg`, func.script);
-      });
-
-      await bitbucketCommit(
-        auth,
-        name,
-        formData,
-        format(new Date(), "dd-MM-yyyy HH:mm:ss")
-      );
-    },
-    onSuccess: () => {
-      toast.success("Functions pushed successfully");
-    },
-    onError: (err) => {
-      toast.error(err.message || "Error pushing to git");
-    },
-  });
-
   const lowercasedSearch = search.toLowerCase();
   const filteredAccordian = app?.accordian?.reduce((acc: any[], form: any) => {
     const formNameLower = form?.name?.toLowerCase() || "";
@@ -241,14 +214,15 @@ export default function Page({ params }: { params: { username: string } }) {
                   </Description>
                 </div>
                 <div className="ml-auto flex items-center gap-3">
-                  <ButtonLoading
-                    variant="secondary"
-                    icon={ArrowUpFromLine}
-                    loading={mutationPushToGit.isPending}
-                    onClick={() => mutationPushToGit.mutate()}
-                  >
-                    <span>Push to Git</span>
-                  </ButtonLoading>
+                  <PushToGitButton
+                    project={project}
+                    data={app?.accordian?.flatMap((form: any) =>
+                      (form.workflows ?? []).map((func: any) => ({
+                        folder: `creator/workflows/${func.WFName}.dg`,
+                        script: func.script,
+                      }))
+                    )}
+                  />
                   <ButtonLoading
                     icon={RefreshCcw}
                     loading={mutationRefreshCreator.isPending}
