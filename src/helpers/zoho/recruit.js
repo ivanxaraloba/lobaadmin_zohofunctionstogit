@@ -5,10 +5,10 @@ export const recruitGetFunctions = async (domain, config) => {
   try {
     const url = `https://recruit.zoho.${domain}/recruit/v2/settings/functions?type=org&start=1&limit=50`;
     const { data } = await axios.get(url, { headers: config });
-    return data.functions;
+
+    return { data: data.functions, error: null };
   } catch (err) {
-    console.log(err.response.data);
-    return [];
+    return { data: null, error: err.response.data };
   }
 };
 

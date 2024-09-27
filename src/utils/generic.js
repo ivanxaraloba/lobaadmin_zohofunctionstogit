@@ -1,8 +1,9 @@
 import { formatDistanceToNow } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { pt } from "date-fns/locale";
 
 export const arr = {
-  groupBy(array, key) {
+  groupInObj: (array, key) => {
     return array.reduce((acc, obj) => {
       const keyParts = key.split(".");
 
@@ -18,6 +19,30 @@ export const arr = {
 
       return acc;
     }, {});
+  },
+  groupInArr: (array, key) => {
+    const grouped = array.reduce((acc, obj) => {
+      const keyParts = key.split(".");
+      const keyValue = keyParts.reduce((value, part) => {
+        return value ? value[part] : undefined;
+      }, obj);
+
+      // Find the existing group by keyValue
+      let group = acc.find((g) => g.label === keyValue);
+
+      // If the group doesn't exist, create it
+      if (!group) {
+        group = { label: keyValue, items: [] };
+        acc.push(group);
+      }
+
+      // Add the current object to the group's items
+      group.items.push(obj);
+
+      return acc;
+    }, []);
+
+    return grouped;
   },
   sortBy: (arr, key) => {
     return arr.sort((a, b) => {
@@ -42,6 +67,21 @@ export const arr = {
         return (aValue > bValue) - (aValue < bValue); // Handle other types (numbers, dates, etc.)
       }
     });
+  },
+  concat: (arr1 = [], arr2 = [], key) => {
+    if (!arr1) arr1 = [];
+    if (!arr2) arr2 = [];
+    const combinedArray = [...arr1, ...arr2];
+
+    const uniqueArray = combinedArray.reduce((acc, current) => {
+      const found = acc.find((item) => item[key] === current[key]);
+      if (!found) {
+        acc.push(current);
+      }
+      return acc;
+    }, []);
+
+    return uniqueArray || [];
   },
 };
 
@@ -134,5 +174,18 @@ export const time = {
     });
 
     return result;
+  },
+  getTimestamptz: () => {
+    return formatInTimeZone(
+      new Date(),
+      "Europe/Lisbon",
+      "yyyy-MM-dd'T'HH:mm:ss"
+    );
+  },
+  fixTime: (datetime) => {
+    return new Date(datetime).setTime(
+      new Date(datetime).getTime() +
+        new Date(datetime).getTimezoneOffset() * 60 * 1000
+    );
   },
 };

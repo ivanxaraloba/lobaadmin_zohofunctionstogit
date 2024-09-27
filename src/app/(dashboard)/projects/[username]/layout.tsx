@@ -17,7 +17,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const { username } = useParams<{ username: string }>();
-
   const { getProject } = useProjectStore();
 
   useQuery<any>({
@@ -26,6 +25,10 @@ export default function RootLayout({
       return getProject(username);
     },
   });
+
+  // useEffect(() => {
+  //   getProject(username);
+  // }, []);
 
   const routes = [
     {

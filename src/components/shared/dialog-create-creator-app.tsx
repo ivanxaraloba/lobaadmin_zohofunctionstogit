@@ -71,7 +71,12 @@ export default function DialogCreateCreatorApp() {
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" size="sm" onClick={() => setIsOpen(true)}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full"
+            onClick={() => setIsOpen(true)}
+          >
             <Plus className="size-4" />
           </Button>
         </DialogTrigger>

@@ -48,18 +48,19 @@ export default function DialogSettingsRecruit() {
     mode: "onChange",
     resolver: zodResolver(formSchema),
     defaultValues: {
-      // @ts-ignore
-      file: null,
+      file: undefined,
     },
   });
 
   const mutationUpdateSettings = useMutation({
     mutationFn: async ({ file }: { file: any }) => {
+      console.log("dasdsadas");
+      
       const content = await files.read(file);
       const json = JSON.parse(content);
 
       let config = {
-        cookie: obj.findToken(json, "cookie"),
+        cookie: obj.findToken(json, "cookie", "CSRF_TOKEN"),
         "x-recruit-org": obj.findToken(json, "x-recruit-org"),
         "x-zcsrf-token": obj.findToken(json, "x-zcsrf-token"),
         "user-agent": obj.findToken(json, "user-agent"),

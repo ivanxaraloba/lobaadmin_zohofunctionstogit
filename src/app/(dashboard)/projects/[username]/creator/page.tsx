@@ -10,11 +10,14 @@ import { supabase } from "@/lib/supabase/client";
 import { Project, creatorApp } from "@/types/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
+  Angry,
   ArrowUpFromLine,
   Book,
   FolderCode,
   RefreshCcw,
   Trash,
+  TriangleAlert,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -46,103 +49,34 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { PushToGitButton } from "@/components/shared/button-push-to-git";
+import LogoCreator from "@/assets/img/logo-creator";
+import { ButtonNavTabs } from "@/components/vercel/button-nav-tabs";
+import TabWorkflows from "./tab_workflows";
+import DialogConfirmation from "@/components/shared/dialog-confirmation";
+import SectionMissing from "@/components/shared/section-missing";
+
+const TABS = [
+  { id: "workflows", label: "Workflows" },
+  { id: "functions", label: "Functions" },
+];
 
 export default function Page({ params }: { params: { username: string } }) {
-  const router = useRouter();
   const { username } = params;
-  const [app, setApp] = useState<creatorApp | null>(null);
-  const [code, setCode] = useState<string>("");
   const { user, getUser } = useGlobalStore();
   const { project, getProject } = useProjectStore();
-  const [search, setSearch] = useState("");
-
-  const mutationRefreshCreator = useMutation({
-    mutationFn: async () => {
-      if (!project) throw new Error("Project data is not available.");
-
-      const { data: accordian, error: errorAccordian } =
-        await creatorGetAppStructure(
-          project.domain,
-          project.creator?.config,
-          project.creator?.owner,
-          app?.name
-        );
-
-      if (errorAccordian) throw errorAccordian;
-
-      const accordianWithCode = await Promise.all(
-        // @ts-ignore
-        accordian.map(async (functionInfo: any) => {
-          const workflowsWithCode = await Promise.all(
-            functionInfo.workflows.map(async (workflow: any) => {
-              try {
-                // Use creatorGetFunction to fetch workflow script
-                const { script } = await creatorGetFunction(
-                  project.domain,
-                  project.creator?.config,
-                  project.creator?.owner,
-                  app?.name,
-                  workflow.WFLinkName
-                );
-
-                return {
-                  ...workflow,
-                  script,
-                };
-              } catch (error) {
-                console.error(
-                  "Error fetching workflow script for",
-                  workflow.WFLinkName,
-                  error
-                );
-                return { ...workflow, script: null };
-              }
-            })
-          );
-
-          return {
-            ...functionInfo,
-            workflows: workflowsWithCode, // Attach fetched workflows with code
-          };
-        })
-      );
-      const { data, error } = await supabase
-        .from("creatorApps")
-        .update({
-          id: project.crm?.id,
-          accordian: accordianWithCode,
-          lastSync: formatInTimeZone(
-            new Date(),
-            "Europe/Lisbon",
-            "yyyy-MM-dd'T'HH:mm:ss"
-          ),
-        })
-        .eq("creatorId", project.creator?.id)
-        .eq("name", app?.name)
-        .select()
-        .single();
-
-      if (error) throw new Error("Failed to update app accordian");
-
-      return data;
-    },
-    onSuccess: (data: creatorApp) => {
-      setApp(data);
-      toast.success("App functions updated successfully.");
-    },
-    onError: (err) => {
-      toast.error(typeof err === "string" ? err : err?.message);
-    },
-  });
+  const [app, setApp] = useState<creatorApp | null>(
+    project?.creator?.creatorApps?.[0] || null
+  );
+  const [activeTab, setActiveTab] = useState<string>(TABS[0].id);
 
   const mutationDeleteApp = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (appId: any) => {
       if (!project) throw new Error("Project data is not available");
 
       const { error } = await supabase
         .from("creatorApps")
         .delete()
-        .eq("id", app?.id);
+        .eq("id", appId);
       if (error) throw error;
     },
     onSuccess: async () => {
@@ -155,40 +89,14 @@ export default function Page({ params }: { params: { username: string } }) {
     },
   });
 
-  const lowercasedSearch = search.toLowerCase();
-  const filteredAccordian = app?.accordian?.reduce((acc: any[], form: any) => {
-    const formNameLower = form?.name?.toLowerCase() || "";
-
-    if (formNameLower.includes(lowercasedSearch)) {
-      acc.push({ ...form, workflows: form.workflows });
-      return acc;
-    }
-
-    const filteredWorkflows = form.workflows.filter((workflow: any) => {
-      const script = workflow.script?.trim().toLowerCase();
-      const wfLinkName = workflow.WFLinkName?.trim().toLowerCase();
-
-      return (
-        (script || wfLinkName) &&
-        (script?.includes(lowercasedSearch) ||
-          wfLinkName?.includes(lowercasedSearch))
-      );
-    });
-
-    if (filteredWorkflows.length > 0) {
-      acc.push({ ...form, workflows: filteredWorkflows });
-    }
-
-    return acc;
-  }, []);
-
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex gap-2">
+    <div className="flex flex-col">
+      <div className="px-4 flex items-center gap-4 text-xs pb-10">
+        <LogoCreator size={26} />
         <TypographyH1>Zoho Creator</TypographyH1>
         <DialogSettingsCreator />
       </div>
-      {project?.creator && (
+      {project?.creator ? (
         <>
           <div className="flex items-center gap-2">
             <DialogCreateCreatorApp />
@@ -197,113 +105,48 @@ export default function Page({ params }: { params: { username: string } }) {
                 <Button
                   key={index}
                   variant={app?.id === item.id ? "default" : "outline"}
-                  size="sm"
                   onClick={() => setApp(item)}
+                  size="sm"
+                  className="rounded-full px-6 relative group"
                 >
-                  {item.name}
+                  <span>{item.name}</span>
+                  <DialogConfirmation
+                    action={() => mutationDeleteApp.mutate(app?.id)}
+                    button={
+                      <div className="hidden -right-1.5 -top-1.5 bg-destructive absolute transition-all group-hover:flex size-5 items-center justify-center rounded-full">
+                        <X className="size-3 text-white" />
+                      </div>
+                    }
+                  />
                 </Button>
               ))}
           </div>
           {app?.id && (
-            <div>
-              <div className="flex items-end">
-                <div className="grid">
-                  <TypographyH2>Workflows</TypographyH2>
-                  <Description>
-                    Last sync occurred {time.timeAgo(app.lastSync)}
-                  </Description>
-                </div>
-                <div className="ml-auto flex items-center gap-3">
-                  <PushToGitButton
-                    project={project}
-                    data={app?.accordian?.flatMap((form: any) =>
-                      (form.workflows ?? []).map((func: any) => ({
-                        folder: `creator/workflows/${func.WFName}.dg`,
-                        script: func.script,
-                      }))
-                    )}
-                  />
-                  <ButtonLoading
-                    icon={RefreshCcw}
-                    loading={mutationRefreshCreator.isPending}
-                    onClick={() => mutationRefreshCreator.mutate()}
-                  >
-                    <span>Sync</span>
-                  </ButtonLoading>
-                  <ButtonLoading
-                    variant="destructive"
-                    icon={Trash}
-                    loading={mutationDeleteApp.isPending}
-                    onClick={() => mutationDeleteApp.mutate()}
-                  >
-                    <span>Delete</span>
-                  </ButtonLoading>
-                </div>
-              </div>
-              <div className="w-full pb-4">
-                <Input
+            <div className="mt-10">
+              <ButtonNavTabs
+                tabs={TABS}
+                activeTabId={activeTab}
+                toggle={setActiveTab}
+                springy
+              />
+              {activeTab === "workflows" && (
+                <TabWorkflows username={username} app={app} setApp={setApp} />
+              )}
+              {activeTab === "functions" && (
+                <SectionMissing
+                  icon={Angry}
+                  message="Espera um pouco ainda estou a fazer"
                   className="mt-10"
-                  placeholder="Search for function name or code"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
                 />
-              </div>
-              {filteredAccordian?.length > 0 && (
-                <div className="grid grid-cols-3 mt-6 gap-x-10 rounded-2xl">
-                  <div className="flex flex-col text-sm gap-10">
-                    {filteredAccordian.map((form: any, index: any) => (
-                      <div
-                        key={index}
-                        className="bg-primary-foreground p-8 rounded-2xl"
-                      >
-                        {/* Form Name */}
-                        <div className="flex items-center gap-2">
-                          <Book className="size-4" />
-                          <span className="text-lg">{form.name}</span>
-                        </div>
-                        {/* Reports / Functions */}
-                        {form?.reports?.length > 0 && (
-                          <div className="mt-4 flex flex-col gap-2">
-                            {form.reports.map((report: any, index: number) => (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                key={index}
-                                className="w-fit text-sm pointer-events-none opacity-30"
-                              >
-                                {report.dn}
-                              </Button>
-                            ))}
-                            {form.workflows.map(
-                              (workflow: any, index: number) => (
-                                <Button
-                                  key={index}
-                                  size="sm"
-                                  variant={
-                                    workflow.script === code
-                                      ? "secondary"
-                                      : "ghost"
-                                  }
-                                  className="text-sm justify-start truncate"
-                                  onClick={() => setCode(workflow.script)}
-                                >
-                                  {str.decodeHtmlSpecialChars(workflow.WFName)}
-                                </Button>
-                              )
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="bg-primary-foreground col-span-2 p-8 rounded-2xl h-[calc(100vh-40px)] sticky top-4 overflow-auto">
-                    <ScriptViewer script={code} />
-                  </div>
-                </div>
               )}
             </div>
           )}
         </>
+      ) : (
+        <SectionMissing
+          icon={TriangleAlert}
+          message="Set up settings to continue"
+        />
       )}
     </div>
   );

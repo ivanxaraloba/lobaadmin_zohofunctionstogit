@@ -22,9 +22,9 @@ export const crmGetFunctions = async (domain, config) => {
       offset += limit;
     }
 
-    return functions;
+    return { data: functions, error: null };
   } catch (err) {
-    return err.response.data;
+    return { data: null, error: err.response.data };
   }
 };
 

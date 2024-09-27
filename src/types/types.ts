@@ -2,7 +2,8 @@ export interface creatorApp {
   id: number;
   name: string;
   accordian: any;
-  lastSync: any;
+  lastSync: string;
+  lastCommit: string;
 }
 
 export interface Deparment {
@@ -11,6 +12,7 @@ export interface Deparment {
 }
 
 export interface Project {
+  // database
   id: number;
   name: string;
   username: string;
@@ -23,7 +25,8 @@ export interface Project {
     projectId: number;
     functions: any[];
     created_at: any;
-    lastSync: any;
+    lastSync: string;
+    lastCommit: string;
     config: {};
   };
   creator?: {
@@ -44,7 +47,10 @@ export interface Project {
     created_at: any;
     config: {};
     lastSync: string;
+    lastCommit: string;
   };
+  // added
+  _repository: string;
 }
 
 export interface Function {

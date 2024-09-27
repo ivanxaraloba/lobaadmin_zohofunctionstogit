@@ -19,12 +19,17 @@ export const useProjectStore = create<ProjectState>((set) => ({
       .single();
 
     if (error) {
-      console.error("Error fetching project info:", error);
+      console.log("Error fetching project info:", error);
       return;
     }
 
     if (data) {
-      set({ project: data });
+      set({
+        project: {
+          ...data,
+          _repository: `lobaz2g-${data.domain}-${data.username}`,
+        },
+      });
     }
   },
 }));

@@ -9,7 +9,7 @@ import { ThemeProvider } from "@/providers/theme";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Loba Projects",
+  title: "LOBA | Z2G",
   description: "by ivan xara",
 };
 

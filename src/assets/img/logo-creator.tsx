@@ -1,12 +1,12 @@
 import React from "react";
 
-export default function LogoCreator() {
+export default function LogoCreator({ size = 18 }: { size: number }) {
   return (
     <svg
       version="1.0"
       xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
+      width={size}
+      height={size}
       viewBox="0 0 1024.000000 1024.000000"
       preserveAspectRatio="xMidYMid meet"
       className="fill-current stroke-current text-black dark:text-white dark:stroke-gray-400"

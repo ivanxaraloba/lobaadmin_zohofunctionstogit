@@ -1,53 +1,84 @@
+import { arr } from "@/utils/generic";
 import { useState } from "react";
 
-export function useSearch<T>(
-  data: T[],
-  searchKey: keyof T,
-  additionalKeys: (keyof T)[] = []
-) {
-  const [filters, setFilters] = useState({
-    search: "",
+export function useSearch<T>({
+  data = [],
+  searchKeys,
+  groupBy,
+}: {
+  data: T[] | undefined;
+  searchKeys: keyof T | (keyof T)[];
+  groupBy: string;
+}) {
+  const [search, setSearch] = useState({
+    text: "",
     caseSensitive: false,
     wholeWord: false,
   });
 
-  const filteredData = data.filter((item) => {
-    let searchValue = filters.search || "";
+  if (!data) data = [];
+
+  data = data.filter((item) => {
+    let searchValue = search.text || "";
     if (!searchValue) return true;
 
-    let primaryValue = item[searchKey] as unknown as string;
-    let additionalValues = additionalKeys.map(
+    const searchKeysArray = Array.isArray(searchKeys)
+      ? searchKeys
+      : [searchKeys];
+
+    const primaryValues = searchKeysArray.map(
       (key) => item[key] as unknown as string
     );
 
-    if (!filters.caseSensitive) {
-      primaryValue = primaryValue?.toLowerCase() || "";
-      additionalValues = additionalValues.map(
-        (val) => val?.toLowerCase() || ""
-      );
+    let filteredValues = primaryValues;
+
+    if (!search.caseSensitive) {
+      filteredValues = filteredValues.map((val) => val?.toLowerCase() || "");
       searchValue = searchValue.toLowerCase();
     }
 
-    if (filters.wholeWord) {
+    if (search.wholeWord) {
       const regex = new RegExp(
         `\\b${searchValue}\\b`,
-        filters.caseSensitive ? "" : "i"
+        search.caseSensitive ? "" : "i"
       );
-      return (
-        regex.test(primaryValue) ||
-        additionalValues.some((val) => regex.test(val))
-      );
+      return filteredValues.some((val) => regex.test(val));
     }
 
-    return (
-      primaryValue.includes(searchValue) ||
-      additionalValues.some((val) => val.includes(searchValue))
-    );
+    return filteredValues.some((val) => val.includes(searchValue));
   });
 
+  const [columns, setColumns] = useState([]);
+  const setColumn = (columnKey: string, value: any) => {
+    // @ts-ignore
+    setColumns((prevColumns: any) => {
+      const columnIndex = prevColumns.findIndex(
+        (column: any) => column.key === columnKey
+      );
+      if (columnIndex > -1) {
+        // Update existing column value
+        const updatedColumns = [...prevColumns];
+        updatedColumns[columnIndex] = { key: columnKey, value };
+        return updatedColumns;
+      } else {
+        // Add new column
+        return [...prevColumns, { key: columnKey, value }];
+      }
+    });
+  };
+
+  if (columns.length) {
+    columns.forEach(({ key, value }) => {
+      if (value) data = data.filter((item) => item[key] === value);
+    });
+  }
+
+  data = arr.groupInArr(data, groupBy);
+
   return {
-    data: filteredData,
-    filters,
-    setFilters,
+    data,
+    search,
+    setSearch,
+    setColumn,
   };
 }

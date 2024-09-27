@@ -12,16 +12,18 @@ interface UsePushToGitParams {
   project: any;
   data: { folder: string; script: string }[];
   message: string;
+  onSuccess?: () => Function | Promise<void>;
 }
 
 export const usePushToGit = ({
   project,
   data,
   message,
+  onSuccess,
 }: UsePushToGitParams) => {
   const { user } = useGlobalStore();
 
-  const name = `loba-projects_${project?.username}`;
+  const name = project._repository;
   const auth = {
     username: user?.profile?.bbUsername,
     password: user?.profile?.bbPassword,
@@ -30,6 +32,7 @@ export const usePushToGit = ({
   return useMutation({
     mutationFn: async () => {
       let repository = await bitbucketGetRepository(auth, name);
+      console.log({ repository });
       if (!repository) repository = await bitbucketCreateRepository(auth, name);
 
       const formData = new FormData();
@@ -37,9 +40,10 @@ export const usePushToGit = ({
         formData.append(folder, script);
       });
 
-      await bitbucketCommit(auth, name, formData, message);
+      const response = await bitbucketCommit(auth, name, formData, message);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      onSuccess && (await onSuccess());
       toast.success("Functions pushed successfully");
     },
     onError: (err: any) => {

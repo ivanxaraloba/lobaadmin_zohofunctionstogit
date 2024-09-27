@@ -61,10 +61,8 @@ export const bitbucketCommit = async (
         auth,
       }
     );
-    console.log(response.data);
     return response.data;
   } catch (err) {
-    console.log(err);
     console.log(err.response?.data || err.message);
   }
 };
