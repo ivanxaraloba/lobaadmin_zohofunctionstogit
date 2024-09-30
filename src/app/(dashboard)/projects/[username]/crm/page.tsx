@@ -52,6 +52,7 @@ import { ButtonNavTabs } from "@/components/vercel/button-nav-tabs";
 import LogoCrm from "@/assets/img/logo-crm";
 import TabFunctions from "./tab_functions";
 import SectionMissing from "@/components/shared/section-missing";
+import LoadingScreen from "@/components/shared/loading-screen";
 
 const TABS = [
   { id: "functions", label: "Functions" },
@@ -64,35 +65,44 @@ export default function Page({ params }: { params: { username: string } }) {
   const [activeTab, setActiveTab] = useState<string>(TABS[0].id);
 
   return (
-    <div className="flex flex-col">
-      <div className="px-4 flex items-center gap-4 text-xs pb-10">
-        <LogoCrm size={30} />
-        <TypographyH1>Zoho CRM</TypographyH1>
-        <DialogSettingsCRM />
-      </div>
-      {project?.crm ? (
-        <div className="flex flex-col">
-          <ButtonNavTabs
-            tabs={TABS}
-            activeTabId={activeTab}
-            toggle={setActiveTab}
-            springy
-          />
-          {activeTab === "functions" && <TabFunctions username={username} />}
-          {activeTab === "clientscripts" && (
-            <SectionMissing
-              icon={Angry}
-              message="Espera um pouco ainda estou a fazer"
-              className="mt-10"
-            />
-          )}
+    <>
+      {!project && <LoadingScreen />}
+      <div className="flex flex-col">
+        <div className="px-4 flex items-center gap-4 text-xs pb-10">
+          <LogoCrm size={30} />
+          <TypographyH1>Zoho CRM</TypographyH1>
+          <DialogSettingsCRM />
         </div>
-      ) : (
-        <SectionMissing
-          icon={TriangleAlert}
-          message="Set up settings to continue"
-        />
-      )}
-    </div>
+        {project && (
+          <>
+            {project?.crm ? (
+              <div className="flex flex-col">
+                <ButtonNavTabs
+                  tabs={TABS}
+                  activeTabId={activeTab}
+                  toggle={setActiveTab}
+                  springy
+                />
+                {activeTab === "functions" && (
+                  <TabFunctions username={username} />
+                )}
+                {activeTab === "clientscripts" && (
+                  <SectionMissing
+                    icon={Angry}
+                    message="Espera um pouco ainda estou a fazer"
+                    className="mt-10"
+                  />
+                )}
+              </div>
+            ) : (
+              <SectionMissing
+                icon={TriangleAlert}
+                message="Set up settings to continue"
+              />
+            )}
+          </>
+        )}
+      </div>
+    </>
   );
 }

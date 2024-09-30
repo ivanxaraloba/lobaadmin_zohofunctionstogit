@@ -54,6 +54,7 @@ import { ButtonNavTabs } from "@/components/vercel/button-nav-tabs";
 import TabWorkflows from "./tab_workflows";
 import DialogConfirmation from "@/components/shared/dialog-confirmation";
 import SectionMissing from "@/components/shared/section-missing";
+import LoadingScreen from "@/components/shared/loading-screen";
 
 const TABS = [
   { id: "workflows", label: "Workflows" },
@@ -90,64 +91,75 @@ export default function Page({ params }: { params: { username: string } }) {
   });
 
   return (
-    <div className="flex flex-col">
-      <div className="px-4 flex items-center gap-4 text-xs pb-10">
-        <LogoCreator size={26} />
-        <TypographyH1>Zoho Creator</TypographyH1>
-        <DialogSettingsCreator />
-      </div>
-      {project?.creator ? (
-        <>
-          <div className="flex items-center gap-2">
-            <DialogCreateCreatorApp />
-            {project?.creator?.creatorApps &&
-              project?.creator?.creatorApps.map((item, index) => (
-                <Button
-                  key={index}
-                  variant={app?.id === item.id ? "default" : "outline"}
-                  onClick={() => setApp(item)}
-                  size="sm"
-                  className="rounded-full px-6 relative group"
-                >
-                  <span>{item.name}</span>
-                  <DialogConfirmation
-                    action={() => mutationDeleteApp.mutate(app?.id)}
-                    button={
-                      <div className="hidden -right-1.5 -top-1.5 bg-destructive absolute transition-all group-hover:flex size-5 items-center justify-center rounded-full">
-                        <X className="size-3 text-white" />
-                      </div>
-                    }
-                  />
-                </Button>
-              ))}
-          </div>
-          {app?.id && (
-            <div className="mt-10">
-              <ButtonNavTabs
-                tabs={TABS}
-                activeTabId={activeTab}
-                toggle={setActiveTab}
-                springy
+    <>
+      {!project && <LoadingScreen />}
+      <div className="flex flex-col">
+        <div className="px-4 flex items-center gap-4 text-xs pb-10">
+          <LogoCreator size={26} />
+          <TypographyH1>Zoho Creator</TypographyH1>
+          <DialogSettingsCreator />
+        </div>
+        {project && (
+          <>
+            {project?.creator ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <DialogCreateCreatorApp />
+                  {project?.creator?.creatorApps &&
+                    project?.creator?.creatorApps.map((item, index) => (
+                      <Button
+                        key={index}
+                        variant={app?.id === item.id ? "default" : "outline"}
+                        onClick={() => setApp(item)}
+                        size="sm"
+                        className="rounded-full px-6 relative group"
+                      >
+                        <span>{item.name}</span>
+                        <DialogConfirmation
+                          action={() => mutationDeleteApp.mutate(app?.id)}
+                          button={
+                            <div className="hidden -right-1.5 -top-1.5 bg-destructive absolute transition-all group-hover:flex size-5 items-center justify-center rounded-full">
+                              <X className="size-3 text-white" />
+                            </div>
+                          }
+                        />
+                      </Button>
+                    ))}
+                </div>
+                {app?.id && (
+                  <div className="mt-10">
+                    <ButtonNavTabs
+                      tabs={TABS}
+                      activeTabId={activeTab}
+                      toggle={setActiveTab}
+                      springy
+                    />
+                    {activeTab === "workflows" && (
+                      <TabWorkflows
+                        username={username}
+                        app={app}
+                        setApp={setApp}
+                      />
+                    )}
+                    {activeTab === "functions" && (
+                      <SectionMissing
+                        icon={Angry}
+                        message="Espera um pouco ainda estou a fazer"
+                        className="mt-10"
+                      />
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <SectionMissing
+                icon={TriangleAlert}
+                message="Set up settings to continue"
               />
-              {activeTab === "workflows" && (
-                <TabWorkflows username={username} app={app} setApp={setApp} />
-              )}
-              {activeTab === "functions" && (
-                <SectionMissing
-                  icon={Angry}
-                  message="Espera um pouco ainda estou a fazer"
-                  className="mt-10"
-                />
-              )}
-            </div>
-          )}
-        </>
-      ) : (
-        <SectionMissing
-          icon={TriangleAlert}
-          message="Set up settings to continue"
-        />
-      )}
-    </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
   );
 }

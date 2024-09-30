@@ -59,7 +59,9 @@ export default function RootLayout({
       <div className="ml-[68px]">
         <div className="flex flex-col">
           <HeaderProject />
-          <div className="p-10">{children}</div>
+          <div className="relative">
+            <div className="p-10">{children}</div>
+          </div>
         </div>
       </div>
     </div>

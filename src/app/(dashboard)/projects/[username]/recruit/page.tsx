@@ -54,6 +54,7 @@ import SectionMissing from "@/components/shared/section-missing";
 import LogoRecruit from "@/assets/img/logo-recruit";
 import DialogSettingsRecruit from "@/components/shared/dialog-settings-recruit";
 import TabFunctions from "./tab_functions";
+import LoadingScreen from "@/components/shared/loading-screen";
 
 const TABS = [{ id: "functions", label: "Functions" }];
 
@@ -63,28 +64,37 @@ export default function Page({ params }: { params: { username: string } }) {
   const [activeTab, setActiveTab] = useState<string>(TABS[0].id);
 
   return (
-    <div className="flex flex-col">
-      <div className="px-4 flex items-center gap-4 text-xs pb-10">
-        <LogoRecruit size={30} />
-        <TypographyH1>Zoho Recruit</TypographyH1>
-        <DialogSettingsRecruit />
-      </div>
-      {project?.recruit ? (
-        <div className="flex flex-col">
-          <ButtonNavTabs
-            tabs={TABS}
-            activeTabId={activeTab}
-            toggle={setActiveTab}
-            springy
-          />
-          {activeTab === "functions" && <TabFunctions username={username} />}
+    <>
+      {!project && <LoadingScreen />}
+      <div className="flex flex-col">
+        <div className="px-4 flex items-center gap-4 text-xs pb-10">
+          <LogoRecruit size={30} />
+          <TypographyH1>Zoho Recruit</TypographyH1>
+          <DialogSettingsRecruit />
         </div>
-      ) : (
-        <SectionMissing
-          icon={TriangleAlert}
-          message="Set up settings to continue"
-        />
-      )}
-    </div>
+        {project && (
+          <>
+            {project?.recruit ? (
+              <div className="flex flex-col">
+                <ButtonNavTabs
+                  tabs={TABS}
+                  activeTabId={activeTab}
+                  toggle={setActiveTab}
+                  springy
+                />
+                {activeTab === "functions" && (
+                  <TabFunctions username={username} />
+                )}
+              </div>
+            ) : (
+              <SectionMissing
+                icon={TriangleAlert}
+                message="Set up settings to continue"
+              />
+            )}
+          </>
+        )}
+      </div>
+    </>
   );
 }
