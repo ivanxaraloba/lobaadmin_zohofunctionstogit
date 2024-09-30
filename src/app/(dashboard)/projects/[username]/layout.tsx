@@ -35,19 +35,22 @@ export default function RootLayout({
     {
       icon: LogoCrm,
       to: `/projects/${username}/crm`,
+      disabled: !project?.crm,
       className: cn(!project?.crm && "opacity-40"),
     },
     {
       icon: LogoCreator,
       to: `/projects/${username}/creator`,
+      disabled: !project?.creator,
       className: cn(!project?.creator && "opacity-40"),
     },
     {
       icon: LogoRecruit,
       to: `/projects/${username}/recruit`,
+      disabled: !project?.recruit,
       className: cn(!project?.recruit && "opacity-40"),
     },
-  ];
+  ].sort((a, b) => (a.disabled ? 1 : 0) - (b.disabled ? 1 : 0));
 
   return (
     <div className="">
