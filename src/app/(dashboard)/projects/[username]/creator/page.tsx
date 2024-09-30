@@ -20,7 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import DialogCreateCreatorApp from "@/components/shared/dialog-create-creator-app";
 import { TypographyH2 } from "@/components/typography/typography-h2";
@@ -65,9 +65,7 @@ export default function Page({ params }: { params: { username: string } }) {
   const { username } = params;
   const { user, getUser } = useGlobalStore();
   const { project, getProject } = useProjectStore();
-  const [app, setApp] = useState<creatorApp | null>(
-    project?.creator?.creatorApps?.[0] || null
-  );
+  const [app, setApp] = useState<creatorApp | null>(null);
   const [activeTab, setActiveTab] = useState<string>(TABS[0].id);
 
   const mutationDeleteApp = useMutation({
@@ -89,6 +87,11 @@ export default function Page({ params }: { params: { username: string } }) {
       toast.error(typeof err === "string" ? err : err?.message);
     },
   });
+
+  useEffect(() => {
+    if (project?.creator?.creatorApps?.length)
+      setApp(project.creator.creatorApps[0]);
+  }, [project?.id]);
 
   return (
     <>

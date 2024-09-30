@@ -185,7 +185,7 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                   className="flex items-center gap-2"
                   href={`https://bitbucket.org/lobadev/${project._repository}/src/master/creator/workflows`}
                 >
-                  Open Bitbucket Reposity
+                  Open Bitbucket Repository
                   <SquareArrowOutUpRight className="size-3" />
                 </Link>
               </Description>

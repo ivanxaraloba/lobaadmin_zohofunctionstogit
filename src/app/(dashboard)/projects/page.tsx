@@ -3,7 +3,14 @@ import DialogCreateProject from "@/components/shared/dialog-create-project";
 import CardProject from "@/components/shared/card-project";
 import { Input } from "@/components/ui/input";
 import { useGlobalStore } from "@/stores/global";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Filter } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export default function Page() {
   const [search, setSearch] = useState("");
@@ -24,6 +31,16 @@ export default function Page() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        <Popover>
+          <PopoverTrigger>
+            <Button variant="outline" size="icon">
+              <Filter className="size-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end">
+            Place content for the popover here.
+          </PopoverContent>
+        </Popover>
       </div>
       <div className="my-6 space-y-4">
         {filteredProjects &&

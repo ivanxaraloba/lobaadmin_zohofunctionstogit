@@ -181,7 +181,7 @@ export default function TabFunctions({ username }: { username: string }) {
                   className="flex items-center gap-2"
                   href={`https://bitbucket.org/lobadev/${project._repository}/src/master/crm/functions`}
                 >
-                  Open Bitbucket Reposity
+                  Open Bitbucket Repository
                   <SquareArrowOutUpRight className="size-3" />
                 </Link>
               </Description>

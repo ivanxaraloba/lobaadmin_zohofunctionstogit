@@ -55,8 +55,8 @@ export default function CardProject({ project }: any) {
           </div>
         </div>
       </div>
-      <div className="absolute right-4 top-4 text-foreground-lighter transition-all duration-200 group-hover:right-3 group-hover:text-foreground">
-        <ChevronRight />
+      <div className="absolute right-4 top-4 text-foreground-lighter transition-all duration-200 group-hover:right-2 group-hover:text-foreground">
+        <ChevronRight strokeWidth={1} />
       </div>
     </Link>
   );
