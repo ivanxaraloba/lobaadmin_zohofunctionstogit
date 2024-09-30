@@ -4,16 +4,21 @@ import { useSearchParams } from "next/navigation";
 interface FilterConfig {
   key: string;
   type: "text" | "number" | "array";
-  transformParams?: (value: any) => any; // Updated name here
+  transformParams?: (value: any) => any;
   matchFn: (item: any, filterValue: any) => boolean;
 }
 
 interface UseFiltersProps {
   data: any[];
   filterConfig: FilterConfig[];
+  searchMatchFn?: (item: any, searchValue: string) => boolean; // New searchMatchFn prop
 }
 
-export function useFilters({ data, filterConfig }: UseFiltersProps) {
+export function useFilters({
+  data,
+  filterConfig,
+  searchMatchFn,
+}: UseFiltersProps) {
   const [search, setSearch] = useState("");
   const [filteredData, setFilteredData] = useState(data);
   const searchParams = useSearchParams();
@@ -38,7 +43,9 @@ export function useFilters({ data, filterConfig }: UseFiltersProps) {
     const applyFilters = () => {
       return data.filter((item) => {
         const matchesSearch = search
-          ? item.name.toLowerCase().includes(search.toLowerCase())
+          ? searchMatchFn
+            ? searchMatchFn(item, search)
+            : item.name.toLowerCase().includes(search.toLowerCase())
           : true;
 
         const matchesFilters = filterConfig.every(({ key, matchFn }) => {
@@ -51,7 +58,7 @@ export function useFilters({ data, filterConfig }: UseFiltersProps) {
     };
 
     setFilteredData(applyFilters());
-  }, [data, search, filters]);
+  }, [data, search, filters, searchMatchFn]);
 
   return {
     search,
