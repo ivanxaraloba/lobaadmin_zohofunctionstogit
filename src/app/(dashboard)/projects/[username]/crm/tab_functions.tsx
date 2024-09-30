@@ -350,15 +350,14 @@ export default function TabFunctions({ username }: { username: string }) {
                         </Description>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm">
-                          <Link
-                            target="_blank"
-                            href={`https://bitbucket.org/lobadev/${project._repository}/src/master/crm/functions/${activeFunction?.display_name}.dg`}
-                            className="size-4"
-                          >
+                        <Link
+                          target="_blank"
+                          href={`https://bitbucket.org/lobadev/${project._repository}/src/master/crm/functions/${activeFunction?.display_name}.dg`}
+                        >
+                          <Button variant="ghost" size="sm">
                             <ArrowUpRightFromSquare className="size-4" />
-                          </Link>
-                        </Button>
+                          </Button>
+                        </Link>
 
                         <Button
                           variant="ghost"

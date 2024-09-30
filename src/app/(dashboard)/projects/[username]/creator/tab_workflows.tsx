@@ -303,15 +303,14 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                         <TypographyH3>{activeFunction.WFName}</TypographyH3>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm">
-                          <Link
-                            target="_blank"
-                            href={`https://bitbucket.org/lobadev/${project._repository}/src/master/creator/workflows/${activeFunction?.WFName}.dg`}
-                            className="size-4"
-                          >
+                        <Link
+                          target="_blank"
+                          href={`https://bitbucket.org/lobadev/${project._repository}/src/master/creator/workflows/${activeFunction?.WFName}.dg`}
+                        >
+                          <Button variant="ghost" size="sm">
                             <ArrowUpRightFromSquare className="size-4" />
-                          </Link>
-                        </Button>
+                          </Button>
+                        </Link>
 
                         <Button
                           variant="ghost"
