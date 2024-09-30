@@ -17,6 +17,7 @@ import CardProject from "@/components/shared/card-project";
 import { useGlobalStore } from "@/stores/global";
 import { PopoverClose } from "@radix-ui/react-popover";
 import { useFilters } from "@/hooks/useFilters";
+import PopoverFilters from "@/components/shared/popover-filters";
 
 export default function Page() {
   const { projects, departments } = useGlobalStore();
@@ -50,61 +51,41 @@ export default function Page() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Popover>
-          <PopoverTrigger>
-            <Button variant="outline" size="icon" className="relative">
-              {count > 0 && (
-                <Badge className="size-4 p-0 flex items-center justify-center rounded-full absolute text-[8px] -bottom-1 -left-1">
-                  {count}
-                </Badge>
-              )}
-              <SlidersHorizontal className="size-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="p-0" align="end">
-            <div className="flex items-center w-full border-b p-3 px-4 bg-primary-foreground">
-              <span className="text-sm">Filter</span>
-              <PopoverClose className="ml-auto">
-                <X className="size-4" />
-              </PopoverClose>
-            </div>
-            <div className="p-4 space-y-4">
-              <div className="space-y-1.5">
-                <Label>Departments</Label>
-                <MultiSelect
-                  defaultValue={filters.departments}
-                  options={departments.map((el: any) => ({
-                    label: el.name,
-                    value: el.id,
-                  }))}
-                  onValueChange={(selected: any) =>
-                    setFilters((prev: any) => ({
-                      ...prev,
-                      departments: selected,
-                    }))
-                  }
-                  placeholder="Select departments"
-                  maxCount={3}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Applications</Label>
-                <MultiSelect
-                  defaultValue={filters.applications}
-                  options={APPLICATIONS}
-                  onValueChange={(selected) =>
-                    setFilters((prev: any) => ({
-                      ...prev,
-                      applications: selected,
-                    }))
-                  }
-                  placeholder="Select applications"
-                  maxCount={3}
-                />
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
+        <PopoverFilters>
+          <div className="space-y-1.5">
+            <Label>Departments</Label>
+            <MultiSelect
+              defaultValue={filters.departments}
+              options={departments.map((el: any) => ({
+                label: el.name,
+                value: el.id,
+              }))}
+              onValueChange={(selected: any) =>
+                setFilters((prev: any) => ({
+                  ...prev,
+                  departments: selected,
+                }))
+              }
+              placeholder="Select departments"
+              maxCount={3}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Applications</Label>
+            <MultiSelect
+              defaultValue={filters.applications}
+              options={APPLICATIONS}
+              onValueChange={(selected) =>
+                setFilters((prev: any) => ({
+                  ...prev,
+                  applications: selected,
+                }))
+              }
+              placeholder="Select applications"
+              maxCount={3}
+            />
+          </div>
+        </PopoverFilters>
       </div>
       <div className="my-6 space-y-4">
         {data?.map((project, index) => (

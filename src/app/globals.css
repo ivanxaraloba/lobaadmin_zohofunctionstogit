@@ -51,30 +51,30 @@
     --radius: 0.5rem;
   }
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: 0 0% 10%; /* Lightened background for a softer dark mode */
+    --foreground: 0 0% 95%; /* Light text for better readability */
+    --card: 0 0% 12%; /* Lighter card background */
+    --card-foreground: 0 0% 95%; /* Bright text on card */
+    --popover: 0 0% 12%; /* Lighter popover background */
+    --popover-foreground: 0 0% 95%; /* Bright text on popover */
+    --primary: 0 0% 95%; /* Primary color for accents */
+    --primary-foreground: 0 0% 15%; /* Darker text on primary */
+    --secondary: 0 0% 20%; /* Lighter secondary background */
+    --secondary-foreground: 0 0% 90%; /* Light text on secondary */
+    --muted: 0 0% 20%; /* Muted background */
+    --muted-foreground: 0 0% 70%; /* Muted text */
+    --accent: 0 0% 20%; /* Lighter accent background */
+    --accent-foreground: 0 0% 95%; /* Light text on accent */
+    --destructive: 0 63% 40%; /* Softer red for destructive actions */
+    --destructive-foreground: 0 0% 95%; /* Light text on destructive */
+    --border: 0 0% 20%; /* Lighter border color */
+    --input: 0 0% 20%; /* Lighter input background */
+    --ring: 0 0% 85%; /* Softer ring color for focus states */
+    --chart-1: 220 70% 55%; /* Lighter chart color 1 */
+    --chart-2: 160 60% 50%; /* Lighter chart color 2 */
+    --chart-3: 30 80% 65%; /* Lighter chart color 3 */
+    --chart-4: 280 65% 70%; /* Lighter chart color 4 */
+    --chart-5: 340 75% 65%; /* Lighter chart color 5 */
   }
 }
 

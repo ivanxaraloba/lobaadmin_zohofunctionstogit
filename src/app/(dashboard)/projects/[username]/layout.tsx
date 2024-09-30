@@ -10,6 +10,7 @@ import LogoCrm from "@/assets/img/logo-crm";
 import LogoCreator from "@/assets/img/logo-creator";
 import Sidebar from "@/components/layout/sidebar";
 import LogoRecruit from "@/assets/img/logo-recruit";
+import { cn } from "@/lib/utils";
 
 export default function RootLayout({
   children,
@@ -17,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const { username } = useParams<{ username: string }>();
-  const { getProject } = useProjectStore();
+  const { project, getProject } = useProjectStore();
 
   useQuery<any>({
     queryKey: ["project", username],
@@ -26,30 +27,25 @@ export default function RootLayout({
     },
   });
 
-  // useEffect(() => {
-  //   getProject(username);
-  // }, []);
-
   const routes = [
     {
-      name: "CRM",
       icon: LayoutDashboard,
       to: `/projects/${username}`,
     },
     {
-      name: "CRM",
       icon: LogoCrm,
       to: `/projects/${username}/crm`,
+      className: cn(!project?.crm && "opacity-40"),
     },
     {
-      name: "Creator",
       icon: LogoCreator,
       to: `/projects/${username}/creator`,
+      className: cn(!project?.creator && "opacity-40"),
     },
     {
-      name: "Recruit",
       icon: LogoRecruit,
       to: `/projects/${username}/recruit`,
+      className: cn(!project?.recruit && "opacity-40"),
     },
   ];
 

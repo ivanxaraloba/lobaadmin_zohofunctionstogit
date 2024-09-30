@@ -29,11 +29,18 @@ export function SidebarItem({ children, to = "", className, onClick }: any) {
   );
 }
 
+interface Route {
+  name?: string;
+  to: string;
+  icon: any;
+  className?: string;
+}
+
 export default function Sidebar({
   routes,
   onlyIcons = false,
 }: {
-  routes: any[];
+  routes: Route[];
   onlyIcons?: boolean;
 }) {
   const router = useRouter();
@@ -51,7 +58,10 @@ export default function Sidebar({
             {routes.map((item: any, index: number) => (
               <SidebarItem
                 key={item.to}
-                className={cn(pathname === item.to && "bg-secondary")}
+                className={cn(
+                  pathname === item.to && "bg-secondary",
+                  item.className
+                )}
                 to={item.to}
               >
                 <item.icon className="size-5" strokeWidth={1.5} />
