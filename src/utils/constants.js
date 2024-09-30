@@ -25,3 +25,9 @@ export const FUNCTIONS_CATEGORIES_OBJ = {
   scheduler: "Scheduler",
   salessignals: "Sales Signals",
 };
+
+export const APPLICATIONS = [
+  { label: "CRM", value: "crm" },
+  { label: "Creator", value: "creator" },
+  { label: "Recruit", value: "recruit" },
+];

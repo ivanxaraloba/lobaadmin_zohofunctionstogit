@@ -33,7 +33,15 @@ export default function HeaderProject() {
 
   return (
     <div className="h-12 px-10 w-full gap-1 flex items-center border-b">
-      <span className="text-xs font-medium">{project?.departments?.name}</span>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() =>
+          router.push(`/projects?departments=${project?.departments.id}`)
+        }
+      >
+        {project?.departments?.name}
+      </Button>
       <Slash />
       <Combobox
         size="sm"

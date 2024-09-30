@@ -179,16 +179,18 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                 <ArrowUpFromLine className="size-3" />
                 Last commit occurred {time.timeAgo(app?.lastCommit) || "-"}
               </Description>
-              <Description className="flex items-center gap-2 mt-4">
-                <Link
-                  target="_blank"
-                  className="flex items-center gap-2"
-                  href={`https://bitbucket.org/lobadev/${project._repository}/src/master/creator/workflows`}
-                >
-                  Open Bitbucket Repository
-                  <SquareArrowOutUpRight className="size-3" />
-                </Link>
-              </Description>
+              {app?.lastCommit && (
+                <Description className="flex items-center gap-2 mt-4">
+                  <Link
+                    target="_blank"
+                    className="flex items-center gap-2"
+                    href={`https://bitbucket.org/lobadev/${project._repository}/src/master/creator/workflows`}
+                  >
+                    Open Bitbucket Repository
+                    <SquareArrowOutUpRight className="size-3" />
+                  </Link>
+                </Description>
+              )}
             </div>
             <div className="ml-auto flex items-center gap-3">
               <PushToGitButton

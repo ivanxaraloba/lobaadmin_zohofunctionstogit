@@ -59,7 +59,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import MultipleSelector from "@/components/ui/multi-select";
 import { TypographyH3 } from "@/components/typography/typography-h3";
 import { CRMFunctions } from "@/types/applications";
 import { format } from "date-fns";
@@ -175,16 +174,18 @@ export default function TabFunctions({ username }: { username: string }) {
                 Last commit occurred{" "}
                 {time.timeAgo(project?.crm?.lastCommit) || "-"}
               </Description>
-              <Description className="flex items-center gap-2 mt-4">
-                <Link
-                  target="_blank"
-                  className="flex items-center gap-2"
-                  href={`https://bitbucket.org/lobadev/${project._repository}/src/master/crm/functions`}
-                >
-                  Open Bitbucket Repository
-                  <SquareArrowOutUpRight className="size-3" />
-                </Link>
-              </Description>
+              {project?.crm?.lastCommit && (
+                <Description className="flex items-center gap-2 mt-4">
+                  <Link
+                    target="_blank"
+                    className="flex items-center gap-2"
+                    href={`https://bitbucket.org/lobadev/${project._repository}/src/master/crm/functions`}
+                  >
+                    Open Bitbucket Repository
+                    <SquareArrowOutUpRight className="size-3" />
+                  </Link>
+                </Description>
+              )}
             </div>
             <div className="ml-auto flex items-center gap-3">
               <PushToGitButton

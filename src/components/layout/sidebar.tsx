@@ -44,7 +44,7 @@ export default function Sidebar({
     <div className="border-r fixed h-screen">
       <div className={cn("px-2 py-8 h-full", onlyIcons ? "w-[68px]" : "w-52")}>
         <div className="flex flex-col w-full h-full">
-          <SidebarItem className="hover:bg-transparent" to="/">
+          <SidebarItem className="hover:bg-transparent" to="/projects">
             <LogoLoba />
           </SidebarItem>
           <div className="flex flex-col mt-5 gap-1">
