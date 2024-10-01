@@ -18,9 +18,7 @@ import LogoRecruit from "@/assets/img/logo-recruit";
 import { ButtonNavTabs } from "@/components/vercel/button-nav-tabs";
 import { useState } from "react";
 
-const TABS = [
-  { id: "functions", label: "Information" },
-];
+const TABS = [{ id: "functions", label: "Information" }];
 
 export default function Page() {
   const router = useRouter();
@@ -56,6 +54,16 @@ export default function Page() {
         <div className="flex items-center gap-4 text-xs pb-10">
           <Settings className="size-8" strokeWidth={1.2} />
           <TypographyH1>{project.name}</TypographyH1>
+          <div className="ml-auto flex items-center gap-2">
+            <ButtonLoading
+              variant="destructive"
+              icon={Trash}
+              loading={mutationDeleteProject.isPending}
+              onClick={() => mutationDeleteProject.mutate()}
+            >
+              <span>Delete</span>
+            </ButtonLoading>
+          </div>
         </div>
         {project && (
           <>
