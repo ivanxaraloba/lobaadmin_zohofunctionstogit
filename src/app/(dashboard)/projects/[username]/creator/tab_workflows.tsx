@@ -1,7 +1,6 @@
 import LogoBitbucket from "@/assets/img/logo-bitbucket";
 import { PushToGitButton } from "@/components/shared/button-push-to-git";
 import ScriptViewer from "@/components/shared/code-viewer";
-import CollapsibleGroupFunctions from "@/components/shared/collapsible-group-functions";
 import SectionMissing from "@/components/shared/section-missing";
 import { TypographyH1 } from "@/components/typography/typography-h1";
 import { TypographyH2 } from "@/components/typography/typography-h2";
@@ -50,6 +49,7 @@ import {
 import { TypographyH3 } from "@/components/typography/typography-h3";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import CardContainer from "@/components/shared/card-container";
 
 interface Props {
   username: string;
@@ -233,67 +233,67 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                 >
                   {data.map(({ label, items }: any, index: any) => {
                     return (
-                      <Collapsible
-                        key={index}
-                        defaultOpen={true}
-                        className="bg-primary-foreground p-6 rounded-2xl"
-                      >
-                        <div className="flex items-center w-full gap-2">
-                          <Parentheses className="size-4" />
-                          <span className="text-base">{label}</span>
-                          <span className="text-xs mt-[4px] text-muted-foreground">
-                            ( {items.length} )
-                          </span>
+                      <Collapsible key={index} defaultOpen={true}>
+                        <CardContainer>
+                          <div className="flex items-center w-full gap-2">
+                            <Parentheses className="size-4" />
+                            <span className="text-base">{label}</span>
+                            <span className="text-xs mt-[4px] text-muted-foreground">
+                              ( {items.length} )
+                            </span>
 
-                          <div className="ml-auto">
-                            <CollapsibleTrigger className="[data-state=open]:hidden">
-                              <ChevronsUpDown className="size-4" />{" "}
-                            </CollapsibleTrigger>
-                          </div>
-                        </div>
-                        <CollapsibleContent className="mt-4">
-                          {items?.length > 0 && (
-                            <div className="flex flex-col gap-2">
-                              {items.map((functionInfo: any, index: number) => {
-                                return (
-                                  <Button
-                                    key={index}
-                                    variant={
-                                      functionInfo.WFLinkName ===
-                                      activeFunction?.WFLinkName
-                                        ? "outline"
-                                        : "ghost"
-                                    }
-                                    className="text-xs justify-start truncate border border-transparent"
-                                    onClick={() =>
-                                      setActiveFunction(functionInfo)
-                                    }
-                                  >
-                                    <span>
-                                      {str.decodeHtmlSpecialChars(
-                                        functionInfo.WFName
-                                      )}
-                                    </span>
-                                    <div className="ml-auto flex items-center gap-2">
-                                      {!functionInfo.script?.length && (
-                                        <TooltipProvider>
-                                          <Tooltip>
-                                            <TooltipTrigger>
-                                              <Ban className="size-3 text-red-400" />
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                              No Code
-                                            </TooltipContent>
-                                          </Tooltip>
-                                        </TooltipProvider>
-                                      )}
-                                    </div>
-                                  </Button>
-                                );
-                              })}
+                            <div className="ml-auto">
+                              <CollapsibleTrigger className="[data-state=open]:hidden">
+                                <ChevronsUpDown className="size-4" />{" "}
+                              </CollapsibleTrigger>
                             </div>
-                          )}
-                        </CollapsibleContent>
+                          </div>
+                          <CollapsibleContent className="mt-4">
+                            {items?.length > 0 && (
+                              <div className="flex flex-col gap-2">
+                                {items.map(
+                                  (functionInfo: any, index: number) => {
+                                    return (
+                                      <Button
+                                        key={index}
+                                        variant={
+                                          functionInfo.WFLinkName ===
+                                          activeFunction?.WFLinkName
+                                            ? "outline"
+                                            : "ghost"
+                                        }
+                                        className="text-xs justify-start truncate border border-transparent"
+                                        onClick={() =>
+                                          setActiveFunction(functionInfo)
+                                        }
+                                      >
+                                        <span>
+                                          {str.decodeHtmlSpecialChars(
+                                            functionInfo.WFName
+                                          )}
+                                        </span>
+                                        <div className="ml-auto flex items-center gap-2">
+                                          {!functionInfo.script?.length && (
+                                            <TooltipProvider>
+                                              <Tooltip>
+                                                <TooltipTrigger>
+                                                  <Ban className="size-3 text-red-400" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                  No Code
+                                                </TooltipContent>
+                                              </Tooltip>
+                                            </TooltipProvider>
+                                          )}
+                                        </div>
+                                      </Button>
+                                    );
+                                  }
+                                )}
+                              </div>
+                            )}
+                          </CollapsibleContent>
+                        </CardContainer>
                       </Collapsible>
                     );
                   })}

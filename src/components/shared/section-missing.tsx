@@ -4,6 +4,7 @@ import { Frown } from "lucide-react";
 import { LucideProps } from "lucide-react";
 import { TypographyH3 } from "../typography/typography-h3";
 import { cn } from "@/lib/utils";
+import CardContainer from "./card-container";
 
 export default function SectionMissing({
   icon: Icon, // Capitalize the prop name when using it as a component
@@ -17,14 +18,11 @@ export default function SectionMissing({
   className?: string;
 }) {
   return (
-    <div
-      className={cn(
-        "flex h-52 justify-center items-center w-full gap-4 bg-primary-foreground p-6 rounded-2xl",
-        className
-      )}
-    >
+    <CardContainer>
+      className=
+      {cn("flex h-52 justify-center items-center w-full gap-4", className)}
       <Icon className="size-5" />
       <TypographyH3>{message}</TypographyH3>
-    </div>
+    </CardContainer>
   );
 }

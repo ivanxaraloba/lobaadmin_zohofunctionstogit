@@ -21,7 +21,7 @@ export default function PopoverFilters({
     <Popover>
       <PopoverTrigger>
         <Button variant="outline" size="icon" className="relative">
-          {count && count > 0 && (
+          {!!count && count > 0 && (
             <Badge className="size-4 p-0 flex items-center justify-center rounded-full absolute text-[8px] -bottom-1 -left-1">
               {count}
             </Badge>

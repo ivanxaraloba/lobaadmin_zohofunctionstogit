@@ -42,7 +42,6 @@ import {
   FUNCTIONS_CATEGORIES_OBJ,
 } from "@/utils/constants";
 import LogoBitbucket from "@/assets/img/logo-bitbucket";
-import CollapsibleGroupFunctions from "@/components/shared/collapsible-group-functions";
 
 import {
   Collapsible,
@@ -65,6 +64,7 @@ import {
   recruitGetFunction,
   recruitGetFunctions,
 } from "@/helpers/zoho/recruit";
+import CardContainer from "@/components/shared/card-container";
 
 export default function TabFunctions({ username }: { username: string }) {
   const { project, getProject } = useProjectStore();
@@ -236,66 +236,64 @@ export default function TabFunctions({ username }: { username: string }) {
                 >
                   {data.map(({ label, items }: any, index: any) => {
                     return (
-                      <Collapsible
-                        key={index}
-                        defaultOpen={true}
-                        className="bg-primary-foreground p-6 rounded-2xl"
-                      >
-                        <div className="flex items-center w-full gap-2">
-                          <Parentheses className="size-4" />
-                          <span className="text-base">
-                            {
-                              FUNCTIONS_CATEGORIES_OBJ[
-                                label as keyof typeof FUNCTIONS_CATEGORIES_OBJ
-                              ]
-                            }
-                          </span>
-                          <span className="text-xs mt-[4px] text-muted-foreground">
-                            ( {items.length} )
-                          </span>
+                      <Collapsible key={index} defaultOpen={true}>
+                        <CardContainer>
+                          <div className="flex items-center w-full gap-2">
+                            <Parentheses className="size-4" />
+                            <span className="text-base">
+                              {
+                                FUNCTIONS_CATEGORIES_OBJ[
+                                  label as keyof typeof FUNCTIONS_CATEGORIES_OBJ
+                                ]
+                              }
+                            </span>
+                            <span className="text-xs mt-[4px] text-muted-foreground">
+                              ( {items.length} )
+                            </span>
 
-                          <div className="ml-auto">
-                            <CollapsibleTrigger className="[data-state=open]:hidden">
-                              <ChevronsUpDown className="size-4" />{" "}
-                            </CollapsibleTrigger>
+                            <div className="ml-auto">
+                              <CollapsibleTrigger className="[data-state=open]:hidden">
+                                <ChevronsUpDown className="size-4" />{" "}
+                              </CollapsibleTrigger>
+                            </div>
                           </div>
-                        </div>
-                        <CollapsibleContent className="mt-4">
-                          {items?.length > 0 && (
-                            <div className="flex flex-col gap-2">
-                              {items.map((functionInfo: any, index: number) => {
-                                return (
-                                  <Button
-                                    key={index}
-                                    variant={
-                                      functionInfo.id === activeFunction?.id
-                                        ? "outline"
-                                        : "ghost"
-                                    }
-                                    className="text-xs justify-start truncate border border-transparent"
-                                    onClick={() =>
-                                      setActiveFunction(functionInfo)
-                                    }
-                                  >
-                                    <span>
-                                      {str.decodeHtmlSpecialChars(
-                                        functionInfo.display_name
-                                      )}
-                                    </span>
-                                    <div className="ml-auto flex items-center gap-2">
-                                      {!functionInfo.workflow?.length && (
-                                        <TooltipProvider>
-                                          <Tooltip>
-                                            <TooltipTrigger>
-                                              <Ban className="size-3 text-red-400" />
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                              No code available
-                                            </TooltipContent>
-                                          </Tooltip>
-                                        </TooltipProvider>
-                                      )}
-                                      {/* {toCommit && (
+                          <CollapsibleContent className="mt-4">
+                            {items?.length > 0 && (
+                              <div className="flex flex-col gap-2">
+                                {items.map(
+                                  (functionInfo: any, index: number) => {
+                                    return (
+                                      <Button
+                                        key={index}
+                                        variant={
+                                          functionInfo.id === activeFunction?.id
+                                            ? "outline"
+                                            : "ghost"
+                                        }
+                                        className="text-xs justify-start truncate border border-transparent"
+                                        onClick={() =>
+                                          setActiveFunction(functionInfo)
+                                        }
+                                      >
+                                        <span>
+                                          {str.decodeHtmlSpecialChars(
+                                            functionInfo.display_name
+                                          )}
+                                        </span>
+                                        <div className="ml-auto flex items-center gap-2">
+                                          {!functionInfo.workflow?.length && (
+                                            <TooltipProvider>
+                                              <Tooltip>
+                                                <TooltipTrigger>
+                                                  <Ban className="size-3 text-red-400" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                  No code available
+                                                </TooltipContent>
+                                              </Tooltip>
+                                            </TooltipProvider>
+                                          )}
+                                          {/* {toCommit && (
                                         <TooltipProvider>
                                           <Tooltip>
                                             <TooltipTrigger>
@@ -307,13 +305,15 @@ export default function TabFunctions({ username }: { username: string }) {
                                           </Tooltip>
                                         </TooltipProvider>
                                       )} */}
-                                    </div>
-                                  </Button>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </CollapsibleContent>
+                                        </div>
+                                      </Button>
+                                    );
+                                  }
+                                )}
+                              </div>
+                            )}
+                          </CollapsibleContent>
+                        </CardContainer>
                       </Collapsible>
                     );
                   })}

@@ -3,12 +3,18 @@
 import { useRouter } from "next/navigation";
 import { TypographyH1 } from "@/components/typography/typography-h1";
 import ButtonLoading from "@/components/ui/button-loading";
-import { Trash } from "lucide-react";
+import { Parentheses, Settings, Trash } from "lucide-react";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase/client";
 import { useProjectStore } from "@/stores/project";
 import { str } from "@/utils/generic";
+import CardContainer from "@/components/shared/card-container";
+import { TypographyH2 } from "@/components/typography/typography-h2";
+import { TypographyH3 } from "@/components/typography/typography-h3";
+import LoadingScreen from "@/components/shared/loading-screen";
+import Description from "@/components/ui/description";
+import LogoRecruit from "@/assets/img/logo-recruit";
 
 export default function Page() {
   const router = useRouter();
@@ -36,20 +42,23 @@ export default function Page() {
   if (!project) return <p>Loading...</p>;
 
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex items-end">
-        <TypographyH1>{project.name}</TypographyH1>
-        <div className="ml-auto flex items-center gap-2">
-          <ButtonLoading
-            variant="destructive"
-            icon={Trash}
-            loading={mutationDeleteProject.isPending}
-            onClick={() => mutationDeleteProject.mutate()}
-          >
-            <span>Delete</span>
-          </ButtonLoading>
+    <>
+      {!project && <LoadingScreen />}
+      <div className="flex flex-col">
+        <div className="flex items-center gap-4 text-xs">
+          <Settings className="size-8" strokeWidth={1.2} />
+          <TypographyH1>Settings</TypographyH1>
         </div>
+        {project && (
+          <>
+            {/* Header */}
+            <div className="py-10 border-b">
+              <TypographyH2>{project.name}</TypographyH2>
+              {/* Information & Buttons */}
+            </div>
+          </>
+        )}
       </div>
-    </div>
+    </>
   );
 }

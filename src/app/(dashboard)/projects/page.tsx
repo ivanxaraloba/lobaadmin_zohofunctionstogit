@@ -51,7 +51,7 @@ export default function Page() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <PopoverFilters>
+        <PopoverFilters count={count}>
           <div className="space-y-1.5">
             <Label>Departments</Label>
             <MultiSelect
