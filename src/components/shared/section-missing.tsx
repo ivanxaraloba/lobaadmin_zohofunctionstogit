@@ -18,9 +18,12 @@ export default function SectionMissing({
   className?: string;
 }) {
   return (
-    <CardContainer>
-      className=
-      {cn("flex h-52 justify-center items-center w-full gap-4", className)}
+    <CardContainer
+      className={cn(
+        "flex h-52 justify-center items-center w-full gap-4",
+        className
+      )}
+    >
       <Icon className="size-5" />
       <TypographyH3>{message}</TypographyH3>
     </CardContainer>
