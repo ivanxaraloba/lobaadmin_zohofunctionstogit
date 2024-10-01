@@ -32,12 +32,10 @@ export const crmGetFunction = async (domain, config, functionInfo) => {
   try {
     const url = `https://crm.zoho.${domain}/crm/v2/settings/functions/${functionInfo.id}?category=${functionInfo.category}&source=crm&language=deluge`;
     const response = await axios.get(url, { headers: config });
+    console.log(response.data);
     return response.data?.functions?.[0];
   } catch (err) {
-    console.error(
-      `Error fetching Zoho function ${functionInfo.display_name}:`,
-      err
-    );
+    console.error(functionInfo.display_name, err);
     return [];
   }
 };

@@ -97,7 +97,7 @@ export default function Page({ params }: { params: { username: string } }) {
     <>
       {!project && <LoadingScreen />}
       <div className="flex flex-col">
-        <div className="px-4 flex items-center gap-4 text-xs pb-10">
+        <div className="flex items-center gap-4 text-xs pb-10">
           <LogoCreator size={26} />
           <TypographyH1>Zoho Creator</TypographyH1>
           <DialogSettingsCreator />
