@@ -47,6 +47,8 @@ import {
   bitbucketUpdateRepositoryName,
 } from "@/helpers/bitbucket";
 import Link from "next/link";
+import DialogConfirmation from "@/components/shared/dialog-confirmation";
+import { Button } from "@/components/ui/button";
 
 const TABS = [{ id: "functions", label: "Project Settings" }];
 
@@ -147,7 +149,7 @@ export default function Page() {
     form.reset({
       ...project,
     });
-  }, [project?.username]);
+  }, [project?.id, project?.username]);
 
   return (
     <>
@@ -189,6 +191,7 @@ export default function Page() {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-10"
                 >
+                  {/* basic information */}
                   <CardContainer className="flex flex-col rounded-lg">
                     <TypographyH3>Basic Information</TypographyH3>
                     <div className="space-y-3 mt-6">
@@ -227,6 +230,7 @@ export default function Page() {
                       />
                     </div>
                   </CardContainer>
+                  {/* username */}
                   <CardContainer className="flex flex-col rounded-lg">
                     <TypographyH3>Username / Repository</TypographyH3>
                     <FormDescription>
@@ -241,7 +245,13 @@ export default function Page() {
                           <FormItem>
                             {/* <FormLabel>Username</FormLabel> */}
                             <FormControl>
-                              <Input placeholder="Username" {...field} />
+                              <Input
+                                placeholder="Username"
+                                {...field}
+                                onChange={(e: any) =>
+                                  field.onChange(str.slugify(e.target.value))
+                                }
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -249,6 +259,7 @@ export default function Page() {
                       />
                     </div>
                   </CardContainer>
+                  {/* domain */}
                   <CardContainer className="flex flex-col rounded-lg">
                     <TypographyH3>Domain</TypographyH3>
                     <FormDescription>
@@ -278,14 +289,16 @@ export default function Page() {
                     </div>
                   </CardContainer>
                   <div className="flex items-center justify-end gap-4 mt-10">
-                    <ButtonLoading
-                      variant="destructive"
-                      icon={Trash}
-                      loading={mutationDeleteProject.isPending}
-                      onClick={() => mutationDeleteProject.mutate()}
-                    >
-                      <span>Delete</span>
-                    </ButtonLoading>
+                    <DialogConfirmation
+                      button={
+                        <Button variant="destructive" type="button">
+                          <span>Delete</span>
+                          <Trash className="size-4 ml-2" />
+                        </Button>
+                      }
+                      action={() => mutationDeleteProject.mutate()}
+                    />
+
                     <ButtonLoading
                       type="submit"
                       icon={Check}
