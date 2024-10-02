@@ -50,7 +50,7 @@ export function Combobox({
           size={size}
           role="combobox"
           aria-expanded={open}
-          className={cn("justify-between w-full active:scale-100", className)}
+          className={cn("justify-between w-full active:scale-100 font-normal", className)}
         >
           {value ? (
             items.find(
@@ -58,7 +58,7 @@ export function Combobox({
               // @ts-ignore
             )?.label
           ) : (
-            <span className="text-muted-foreground opacity-30">
+            <span className="text-muted-foreground">
               {placeholder || "Select item..."}
             </span>
           )}

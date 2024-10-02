@@ -6,7 +6,7 @@ export default function CardContainer({
   className,
 }: {
   children: any;
-  className?: any;
+  className?: string;
 }) {
   return (
     <div className={cn("bg-primary-foreground p-6 rounded-2xl border", className)}>

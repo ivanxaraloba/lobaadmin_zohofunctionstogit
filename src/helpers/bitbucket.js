@@ -9,7 +9,7 @@ export const bitbucketCreateRepository = async (
   auth,
   repositoryName,
   description = "",
-  isPrivate = true
+  isPrivate = false
 ) => {
   try {
     const response = await axios.post(
@@ -64,5 +64,27 @@ export const bitbucketCommit = async (
     return response.data;
   } catch (err) {
     console.log(err.response?.data || err.message);
+  }
+};
+
+export const bitbucketUpdateRepositoryName = async (
+  auth,
+  oldRepositoryName,
+  newRepositoryName
+) => {
+  try {
+    const response = await axios.put(
+      `https://api.bitbucket.org/2.0/repositories/${workspace}/${oldRepositoryName}`,
+      {
+        name: newRepositoryName,
+      },
+      {
+        auth,
+      }
+    );
+
+    return { data: response.data, error: null };
+  } catch (err) {
+    return { data: null, error: err.response?.data };
   }
 };
