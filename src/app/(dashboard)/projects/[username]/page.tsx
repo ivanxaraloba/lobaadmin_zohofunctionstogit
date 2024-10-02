@@ -112,12 +112,12 @@ export default function Page() {
         );
 
         if (repository) {
-          const response = await bitbucketUpdateRepositoryName(
+          const { error } = await bitbucketUpdateRepositoryName(
             auth,
             project?._repository,
             `lobaz2g-${data.domain}-${data.username}`
           );
-          if (response.error) throw new Error("Error updating repository name");
+          if (error) throw new Error(error.message);
         }
       }
 

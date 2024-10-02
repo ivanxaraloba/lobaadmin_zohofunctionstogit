@@ -85,6 +85,6 @@ export const bitbucketUpdateRepositoryName = async (
 
     return { data: response.data, error: null };
   } catch (err) {
-    return { data: null, error: err.response?.data };
+    return { data: null, error: err.response?.data?.error };
   }
 };
