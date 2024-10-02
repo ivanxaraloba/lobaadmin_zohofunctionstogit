@@ -234,8 +234,8 @@ export default function Page() {
                   <CardContainer className="flex flex-col rounded-lg">
                     <TypographyH3>Username / Domain</TypographyH3>
                     <FormDescription>
-                      Changing the username will update the Git repository by
-                      reflecting the new name.
+                      Modifying this data will apply the name change to the Git
+                      repository
                     </FormDescription>
                     <div className="space-y-3 mt-6">
                       <FormField
