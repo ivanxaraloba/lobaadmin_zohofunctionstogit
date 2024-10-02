@@ -39,6 +39,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  DEPARMENTS,
   FUNCTIONS_CATEGORIES_LIST,
   FUNCTIONS_CATEGORIES_OBJ,
 } from "@/utils/constants";
@@ -169,11 +170,13 @@ export default function TabFunctions({ username }: { username: string }) {
                 <RefreshCcw className="size-3" />
                 Last sync occurred {time.timeAgo(project?.crm?.lastSync) || "-"}
               </Description>
-              <Description className="flex items-center gap-2">
-                <ArrowUpFromLine className="size-3" />
-                Last commit occurred{" "}
-                {time.timeAgo(project?.crm?.lastCommit) || "-"}
-              </Description>
+              {project?.departments?.id === DEPARMENTS.FTE && (
+                <Description className="flex items-center gap-2">
+                  <ArrowUpFromLine className="size-3" />
+                  Last commit occurred{" "}
+                  {time.timeAgo(project?.crm?.lastCommit) || "-"}
+                </Description>
+              )}
               {project?.crm?.lastCommit && (
                 <Description className="flex items-center gap-2 mt-4">
                   <Link
@@ -188,14 +191,16 @@ export default function TabFunctions({ username }: { username: string }) {
               )}
             </div>
             <div className="ml-auto flex items-center gap-3">
-              <PushToGitButton
-                project={project}
-                data={project?.crm?.functions?.map((func: any) => ({
-                  folder: `crm/functions/${func.display_name}.dg`,
-                  script: func.workflow,
-                }))}
-                onSuccess={onCommitSuccess}
-              />
+              {project?.departments?.id === DEPARMENTS.FTE && (
+                <PushToGitButton
+                  project={project}
+                  data={project?.crm?.functions?.map((func: any) => ({
+                    folder: `crm/functions/${func.display_name}.dg`,
+                    script: func.workflow,
+                  }))}
+                  onSuccess={onCommitSuccess}
+                />
+              )}
               <ButtonLoading
                 icon={RefreshCcw}
                 loading={mutationRefresh.isPending}

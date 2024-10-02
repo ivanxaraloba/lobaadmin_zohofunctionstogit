@@ -31,3 +31,8 @@ export const APPLICATIONS = [
   { label: "Creator", value: "creator" },
   { label: "Recruit", value: "recruit" },
 ];
+
+export const DEPARMENTS = {
+  FTE: 1,
+  INTERNOS: 2,
+};

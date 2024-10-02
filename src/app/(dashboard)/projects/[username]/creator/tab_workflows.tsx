@@ -50,6 +50,7 @@ import { TypographyH3 } from "@/components/typography/typography-h3";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import CardContainer from "@/components/shared/card-container";
+import { DEPARMENTS } from "@/utils/constants";
 
 interface Props {
   username: string;
@@ -175,10 +176,12 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                 <RefreshCcw className="size-3" />
                 Last sync occurred {time.timeAgo(app?.lastSync) || "-"}
               </Description>
-              <Description className="flex items-center gap-2">
-                <ArrowUpFromLine className="size-3" />
-                Last commit occurred {time.timeAgo(app?.lastCommit) || "-"}
-              </Description>
+              {project?.departments?.id === DEPARMENTS.FTE && (
+                <Description className="flex items-center gap-2">
+                  <ArrowUpFromLine className="size-3" />
+                  Last commit occurred {time.timeAgo(app?.lastCommit) || "-"}
+                </Description>
+              )}
               {app?.lastCommit && (
                 <Description className="flex items-center gap-2 mt-4">
                   <Link
@@ -193,14 +196,16 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
               )}
             </div>
             <div className="ml-auto flex items-center gap-3">
-              <PushToGitButton
-                project={project}
-                data={app?.accordian?.map((func: any) => ({
-                  folder: `creator/workflows/${func.WFName}.dg`,
-                  script: func.script,
-                }))}
-                onSuccess={onCommitSuccess}
-              />
+              {project?.departments?.id === DEPARMENTS.FTE && (
+                <PushToGitButton
+                  project={project}
+                  data={app?.accordian?.map((func: any) => ({
+                    folder: `creator/workflows/${func.WFName}.dg`,
+                    script: func.script,
+                  }))}
+                  onSuccess={onCommitSuccess}
+                />
+              )}
               <ButtonLoading
                 icon={RefreshCcw}
                 loading={mutationRefreshCreator.isPending}
