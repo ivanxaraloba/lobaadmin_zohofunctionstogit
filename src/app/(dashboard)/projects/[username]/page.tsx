@@ -200,7 +200,7 @@ export default function Page() {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Project Name *</FormLabel>
+                            {/* <FormLabel>Project Name *</FormLabel> */}
                             <FormControl>
                               <Input placeholder="Project Name" {...field} />
                             </FormControl>
@@ -213,7 +213,7 @@ export default function Page() {
                         name="departmentId"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Department</FormLabel>
+                            {/* <FormLabel>Department</FormLabel> */}
                             <FormControl>
                               <Combobox
                                 variant="outline"
@@ -232,7 +232,7 @@ export default function Page() {
                   </CardContainer>
                   {/* username */}
                   <CardContainer className="flex flex-col rounded-lg">
-                    <TypographyH3>Username / Repository</TypographyH3>
+                    <TypographyH3>Username / Domain</TypographyH3>
                     <FormDescription>
                       Changing the username will update the Git repository by
                       reflecting the new name.
@@ -257,16 +257,6 @@ export default function Page() {
                           </FormItem>
                         )}
                       />
-                    </div>
-                  </CardContainer>
-                  {/* domain */}
-                  <CardContainer className="flex flex-col rounded-lg">
-                    <TypographyH3>Domain</TypographyH3>
-                    <FormDescription>
-                      Changing the username will update the Git repository by
-                      reflecting the new name.
-                    </FormDescription>
-                    <div className="space-y-3 mt-6">
                       <FormField
                         control={form.control}
                         name="domain"
@@ -287,6 +277,17 @@ export default function Page() {
                         )}
                       />
                     </div>
+
+                    <Description className="mt-2">
+                      lobaz2g-
+                      <span className="text-primary">
+                        {form.watch("domain")}
+                      </span>
+                      -
+                      <span className="text-primary">
+                        {form.watch("username")}
+                      </span>
+                    </Description>
                   </CardContainer>
                   <div className="flex items-center justify-end gap-4 mt-10">
                     <DialogConfirmation
