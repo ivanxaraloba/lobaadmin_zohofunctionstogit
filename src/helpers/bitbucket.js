@@ -9,7 +9,7 @@ export const bitbucketCreateRepository = async (
   auth,
   repositoryName,
   description = "",
-  isPrivate = false
+  isPrivate = true
 ) => {
   try {
     const response = await axios.post(
