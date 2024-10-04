@@ -18,7 +18,7 @@ import {
   SquareArrowOutUpRight,
   X,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { useProjectStore } from "@/stores/project";
@@ -64,8 +64,10 @@ import { CRMFunctions } from "@/types/applications";
 import { format } from "date-fns";
 import SectionMissing from "@/components/shared/section-missing";
 import CardContainer from "@/components/shared/card-container";
+import { useSearchParams } from "next/navigation";
 
 export default function TabFunctions({ username }: { username: string }) {
+  const searchParams = useSearchParams();
   const { project, getProject } = useProjectStore();
   const [activeFunction, setActiveFunction] = useState<CRMFunctions | null>(
     null
@@ -152,6 +154,23 @@ export default function TabFunctions({ username }: { username: string }) {
     searchKeys: ["script", "display_name"],
     groupBy: "category",
   });
+
+  useEffect(() => {
+    // Ensure searchParams exist
+    const functionParam = searchParams.get("function");
+
+    if (functionParam && project?.crm?.functions?.length) {
+      const functionInfo = project.crm.functions.find(
+        (func) => func.name === functionParam
+      );
+
+      if (functionInfo) {
+        setActiveFunction(functionInfo);
+      } else {
+        console.error("Function not found");
+      }
+    }
+  }, [searchParams, project?.crm?.functions]);
 
   return (
     project?.crm && (

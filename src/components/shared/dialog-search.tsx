@@ -149,6 +149,11 @@ export default function DialogSearch() {
                                 key={index}
                                 variant="outline"
                                 className="w-full border text-xs"
+                                onClick={() =>
+                                  redirect(
+                                    `/projects/${project.username}/crm?function=${functionInfo.name}`
+                                  )
+                                }
                               >
                                 {functionInfo.display_name}
                               </Button>
