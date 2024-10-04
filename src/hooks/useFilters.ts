@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 
 interface FilterConfig {
@@ -11,7 +11,7 @@ interface FilterConfig {
 interface UseFiltersProps {
   data: any[];
   filterConfig: FilterConfig[];
-  searchMatchFn?: (item: any, searchValue: string) => boolean; // New searchMatchFn prop
+  searchMatchFn?: (item: any, searchValue: string) => boolean;
 }
 
 export function useFilters({
@@ -23,7 +23,8 @@ export function useFilters({
   const [filteredData, setFilteredData] = useState(data);
   const searchParams = useSearchParams();
 
-  const initializeFilters = () => {
+  // Initialize filters from search params
+  const initializeFilters = useCallback(() => {
     return filterConfig.reduce(
       (acc: Record<string, any>, { key, transformParams }) => {
         const searchValue = searchParams.get(key);
@@ -35,30 +36,45 @@ export function useFilters({
       },
       {}
     );
-  };
+  }, [searchParams, filterConfig]);
 
   const [filters, setFilters] = useState(initializeFilters);
 
   useEffect(() => {
     const applyFilters = () => {
+      const searchLower = search?.toLowerCase() || "";
+
       return data.filter((item) => {
-        const matchesSearch = search
-          ? searchMatchFn
-            ? searchMatchFn(item, search)
-            : item.name.toLowerCase().includes(search.toLowerCase())
-          : true;
+        if (
+          search &&
+          !(searchMatchFn
+            ? searchMatchFn(item, searchLower)
+            : item.name?.toLowerCase().includes(searchLower))
+        ) {
+          return false;
+        }
 
-        const matchesFilters = filterConfig.every(({ key, matchFn }) => {
+        for (const { key, matchFn } of filterConfig) {
           const filterValue = filters[key];
-          return !filterValue.length || matchFn(item, filterValue);
-        });
+          if (filterValue.length && !matchFn(item, filterValue)) {
+            return false;
+          }
+        }
 
-        return matchesSearch && matchesFilters;
+        return true;
       });
     };
 
-    setFilteredData(applyFilters());
-  }, [data, search, filters, searchMatchFn]);
+    const filtered = applyFilters();
+
+    // Only update state if filtered data is different
+    if (
+      filtered.length !== filteredData.length ||
+      filtered.some((item, index) => item !== filteredData[index])
+    ) {
+      setFilteredData(filtered);
+    }
+  }, [data, search, filters, searchMatchFn, filterConfig]);
 
   return {
     search,

@@ -76,6 +76,23 @@
     --chart-4: 280 65% 70%; /* Lighter chart color 4 */
     --chart-5: 340 75% 65%; /* Lighter chart color 5 */
   }
+
+  /* scrollbar */
+
+  *::-webkit-scrollbar {
+    width: 15px;
+  }
+
+  *::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background-color: #2d2d2c;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    border-radius: 14px;
+    border: #2d2d2c 3px solid;
+    background-color: #6a6b6a;
+  }
 }
 
 @layer base {

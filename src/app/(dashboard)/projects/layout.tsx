@@ -1,5 +1,6 @@
 "use client";
 
+import DialogSearch from "@/components/shared/dialog-search";
 import { useGlobalStore } from "@/stores/global";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -25,5 +26,10 @@ export default function RootLayout({
     },
   });
 
-  return <div className="">{children}</div>;
+  return (
+    <div className="">
+      <DialogSearch />
+      {children}
+    </div>
+  );
 }
