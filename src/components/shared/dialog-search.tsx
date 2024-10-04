@@ -83,7 +83,7 @@ export default function DialogSearch() {
             );
 
             return (
-              <Collapsible key={project.id} className="h-full">
+              <Collapsible key={project.id}>
                 <button
                   onClick={() => redirect(`/projects/${project.username}`)}
                   className="text-left w-full hover:bg-primary-foreground border rounded-md rounded-b-none flex flex-row group p-3 text-xs"
@@ -140,7 +140,7 @@ export default function DialogSearch() {
                 <CollapsibleContent className="h-full">
                   <div className="p-3 bg-primary-foreground h-full">
                     <div className="flex w-full h-full">
-                      <div className="grid gap-1 w-full h-full">
+                      <div className="flex flex-col gap-1 w-full h-full">
                         {filteredFunctions &&
                           filteredFunctions.length > 0 &&
                           filteredFunctions.map(
