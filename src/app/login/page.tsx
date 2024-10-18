@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { supabase } from '@/lib/supabase/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -28,7 +28,6 @@ const formSchema = z.object({
 
 export default function Page() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const form = useForm<z.infer<typeof formSchema>>({
     mode: 'onChange',
@@ -51,11 +50,6 @@ export default function Page() {
       toast.error(err.message);
     },
   });
-
-  useEffect(() => {
-    const searchCode = searchParams.get('code') as string;
-    if (searchCode) router.push(`/auth/callback?code=${searchCode}`);
-  }, []);
 
   return (
     <div className="fixed flex h-full w-full items-center justify-center">
