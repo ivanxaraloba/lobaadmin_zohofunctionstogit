@@ -1,8 +1,10 @@
-import { ALargeSmall, WholeWord } from "lucide-react";
-import React from "react";
-import { Button } from "./button";
-import { Input } from "./input";
-import { cn } from "@/lib/utils";
+import React from 'react';
+
+import { cn } from '@/lib/utils';
+import { ALargeSmall, WholeWord } from 'lucide-react';
+
+import { Button } from './button';
+import { Input } from './input';
 
 interface SearchInputProps {
   search: {
@@ -17,27 +19,25 @@ interface SearchInputProps {
 
 export default function SearchInput({
   search = {
-    text: "",
+    text: '',
     caseSensitive: false,
     wholeWord: false,
   },
   setSearch,
-  className = "",
+  className = '',
   ...props
 }: SearchInputProps) {
   return (
-    <div className="flex items-center w-full">
-      <div className={cn("relative flex items-center w-full", className)}>
+    <div className="flex w-full items-center">
+      <div className={cn('relative flex w-full items-center', className)}>
         <Input
           value={search?.text}
-          onChange={(e) =>
-            setSearch((prev: any) => ({ ...prev, text: e.target.value }))
-          }
+          onChange={(e) => setSearch((prev: any) => ({ ...prev, text: e.target.value }))}
           {...props}
         />
         <div className="absolute right-3 flex items-center gap-1">
           <Button
-            variant={search.caseSensitive ? "secondary" : "ghost"}
+            variant={search.caseSensitive ? 'secondary' : 'ghost'}
             size="icon"
             className="size-6 rounded-sm"
             onClick={() =>
@@ -50,7 +50,7 @@ export default function SearchInput({
             <ALargeSmall className="size-4" />
           </Button>
           <Button
-            variant={search.wholeWord ? "secondary" : "ghost"}
+            variant={search.wholeWord ? 'secondary' : 'ghost'}
             size="icon"
             className="size-6 rounded-sm"
             onClick={() =>

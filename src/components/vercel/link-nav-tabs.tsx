@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
-import { usePathname, useSearchParams } from "next/navigation";
+import React, { useEffect, useRef } from 'react';
 
-import React, { useEffect, useRef } from "react";
-import { cn } from "@/lib/utils";
-import LogoCrm from "@/assets/img/logo-crm";
+import { cn } from '@/lib/utils';
+import { usePathname, useSearchParams } from 'next/navigation';
+
+import LogoCrm from '@/assets/img/logo-crm';
 
 const AnimatedNavTabs = ({
   tabs,
@@ -22,9 +23,7 @@ const AnimatedNavTabs = ({
   // this effect is used to animate the tab indicator when the active tab changes
   useEffect(() => {
     // Find the active tab based on the current pathname. Compare the pathname with the data-path attribute of the tab's anchor element.
-    const activeTabRef = tabRefs.current.find(
-      (ref) => ref?.dataset.path === activeTab?.path
-    );
+    const activeTabRef = tabRefs.current.find((ref) => ref?.dataset.path === activeTab?.path);
     if (activeTabRef && tabIndicatorRef.current) {
       // Set the width of the tab indicator to the width of the active tab.
       tabIndicatorRef.current.style.width = `${activeTabRef.offsetWidth}px`;
@@ -43,27 +42,27 @@ const AnimatedNavTabs = ({
       if (hoverBgRef.current) {
         hoverBgRef.current.style.width = `${target.offsetWidth}px`;
         hoverBgRef.current.style.left = `${target.offsetLeft}px`;
-        hoverBgRef.current.style.opacity = "1";
+        hoverBgRef.current.style.opacity = '1';
       }
     };
 
     tabsElements.forEach((tab) => {
-      tab?.addEventListener("mouseenter", handleMouseEnter);
+      tab?.addEventListener('mouseenter', handleMouseEnter);
     });
 
     const handleMouseLeave = () => {
       if (hoverBgRef.current) {
-        hoverBgRef.current.style.opacity = "0";
+        hoverBgRef.current.style.opacity = '0';
       }
     };
 
-    tabContainer?.addEventListener("mouseleave", handleMouseLeave);
+    tabContainer?.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
       tabsElements.forEach((tab) => {
-        tab?.removeEventListener("mouseenter", handleMouseEnter);
+        tab?.removeEventListener('mouseenter', handleMouseEnter);
       });
-      tabContainer?.removeEventListener("mouseleave", handleMouseLeave);
+      tabContainer?.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, []);
 
@@ -76,7 +75,7 @@ const AnimatedNavTabs = ({
           role="tablist"
           tabIndex={0}
         >
-          <div className="px-4 flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-2 px-4 text-xs">
             <LogoCrm />
             <span>Zoho CRM</span>
           </div>
@@ -91,9 +90,9 @@ const AnimatedNavTabs = ({
                 return undefined;
               }}
               data-path={tab.path}
-              data-state={tab.active ? "active" : "inactive"}
+              data-state={tab.active ? 'active' : 'inactive'}
               className={
-                "relative z-10 inline-flex h-11 items-center justify-center whitespace-nowrap rounded-none bg-transparent px-4  text-xs text-muted-foreground shadow-none ring-offset-background transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                'relative z-10 inline-flex h-11 items-center justify-center whitespace-nowrap rounded-none bg-transparent px-4 text-xs text-muted-foreground shadow-none ring-offset-background transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground data-[state=active]:shadow-none'
               }
             >
               {tab.label}
@@ -103,23 +102,19 @@ const AnimatedNavTabs = ({
           <div
             ref={hoverBgRef}
             className={cn(
-              "absolute cursor-pointer bottom-0 z-0 h-full py-2 transition-all motion-reduce:transition-none",
-              springy
-                ? "duration-200 ease-spring-4"
-                : "duration-150 ease-linear"
+              'absolute bottom-0 z-0 h-full cursor-pointer py-2 transition-all motion-reduce:transition-none',
+              springy ? 'ease-spring-4 duration-200' : 'duration-150 ease-linear',
             )}
             style={{ opacity: 0 }}
           >
-            <div className="h-full w-full rounded-sm bg-muted bg-opacity-10 " />
+            <div className="h-full w-full rounded-sm bg-muted bg-opacity-10" />
           </div>
           <div
             ref={tabIndicatorRef}
             // this div animates the width and its left position usong the transition-all class
             className={cn(
-              "absolute bottom-0 z-10 transition-all motion-reduce:transition-none",
-              springy
-                ? "duration-500 ease-spring-4"
-                : "duration-150 ease-linear"
+              'absolute bottom-0 z-10 transition-all motion-reduce:transition-none',
+              springy ? 'ease-spring-4 duration-500' : 'duration-150 ease-linear',
             )}
           >
             <div className="h-[1px] bg-primary" />
@@ -140,8 +135,7 @@ export const LinkNavTabs = ({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const searchParamsString = searchParams.toString();
-  const fullPath =
-    pathname + (searchParamsString.length > 0 ? "?" : "") + searchParamsString;
+  const fullPath = pathname + (searchParamsString.length > 0 ? '?' : '') + searchParamsString;
   const runtimeTabs = tabs.map((tab) => ({
     label: tab.label,
     path: tab.path,

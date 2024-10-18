@@ -1,56 +1,77 @@
-import LogoBitbucket from "@/assets/img/logo-bitbucket";
-import { PushToGitButton } from "@/components/shared/button-push-to-git";
-import ScriptViewer from "@/components/shared/code-viewer";
-import SectionMissing from "@/components/shared/section-missing";
-import { TypographyH1 } from "@/components/typography/typography-h1";
-import { TypographyH2 } from "@/components/typography/typography-h2";
-import { Button } from "@/components/ui/button";
-import ButtonLoading from "@/components/ui/button-loading";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import Description from "@/components/ui/description";
-import SearchInput from "@/components/ui/search-input";
-import {
-  creatorGetAppStructure,
-  creatorGetFunction,
-} from "@/helpers/zoho/creator";
-import { useSearch } from "@/hooks/useSearch";
-import { supabase } from "@/lib/supabase/client";
-import { useProjectStore } from "@/stores/project";
-import { creatorApp } from "@/types/types";
-import { str, time } from "@/utils/generic";
-import { useMutation } from "@tanstack/react-query";
+import React, { useState } from 'react';
+
+import { creatorGetAppStructure, creatorGetFunction } from '@/helpers/zoho/creator';
+import { supabase } from '@/lib/supabase/client';
+import { cn } from '@/lib/utils';
+import { Commit, creatorApp } from '@/types/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import {
   ArrowUpFromLine,
   ArrowUpRightFromSquare,
   Ban,
   ChevronsUpDown,
+  CircleFadingArrowUp,
   Frown,
   Meh,
   Parentheses,
   RefreshCcw,
+  SearchX,
   SquareArrowOutUpRight,
   Trash,
+  TriangleAlert,
   X,
-} from "lucide-react";
-import Link from "next/link";
-import React, { useState } from "react";
-import { toast } from "sonner";
+} from 'lucide-react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 
+import {
+  AppTabContent,
+  AppTabContentBody,
+  AppTabContentHead,
+  AppTabContentMissing,
+  AppTabDescription,
+  AppTabHeader,
+} from '@/components/layout/app-tab';
+import ButtonCommitsHistory from '@/components/shared/button-commits-history';
+import { ButtonCommitsNew } from '@/components/shared/button-commits-new';
+import { ButtonPush } from '@/components/shared/button-push';
+import { PushToGitButton } from '@/components/shared/button-push-to-git';
+import CardContainer from '@/components/shared/card-container';
+import ScriptViewer from '@/components/shared/code-viewer';
+import ListHeaderFunction from '@/components/shared/list-header-functions';
+import ListItemFunction from '@/components/shared/list-item-function';
+import PopoverFilters from '@/components/shared/popover-filters';
+import SectionMissing from '@/components/shared/section-missing';
+import { TypographyH1 } from '@/components/typography/typography-h1';
+import { TypographyH2 } from '@/components/typography/typography-h2';
+import { TypographyH3 } from '@/components/typography/typography-h3';
+import { Button } from '@/components/ui/button';
+import ButtonLoading from '@/components/ui/button-loading';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import Description from '@/components/ui/description';
+import InputSearch from '@/components/ui/input-search';
+import { Label } from '@/components/ui/label';
+import { MultiSelect } from '@/components/ui/multi-select';
+import SearchInput from '@/components/ui/search-input';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { TypographyH3 } from "@/components/typography/typography-h3";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import CardContainer from "@/components/shared/card-container";
-import { DEPARMENTS } from "@/utils/constants";
+} from '@/components/ui/tooltip';
+import { useProjectStore } from '@/stores/project';
+import { useFilters } from '@/hooks/useFilters';
+import { useSearch } from '@/hooks/useSearch';
+import { DEPARMENTS } from '@/utils/constants';
+import { matchByWords } from '@/utils/filters';
+import { arr, str, time } from '@/utils/generic';
+import LogoBitbucket from '@/assets/img/logo-bitbucket';
 
 interface Props {
   username: string;
@@ -59,36 +80,69 @@ interface Props {
 }
 
 export default function TabWorkflows({ username, app, setApp }: Props) {
+  const PATH_TAB = `creator/${app?.name}/workflows`;
+
+  const searchParams = useSearchParams();
   const { project, getProject } = useProjectStore();
-  const [activeFunction, setActiveFunction] = useState<any>(null);
+  const [activeFn, setActiveFn] = useState<any>(null);
 
-  const onCommitSuccess = async () => {
-    if (!app?.id) return;
+  const queryParams = useQuery<any>({
+    queryKey: ['creator_workflows_params', project?.id, searchParams],
+    queryFn: async () => {
+      // search
+      const searchParam = searchParams.get('search') as string;
+      if (searchParam) setSearch(searchParam);
 
-    const lastCommit = time.getTimestamptz();
-    const { error } = await supabase
-      .from("creatorApps")
-      .update({
-        lastCommit,
-      })
-      .eq("id", app.id);
+      // active function
+      const functionParam = searchParams.get('function');
+      if (functionParam && app?.accordian?.length) {
+        const functionInfo = app?.accordian.find(
+          (func) => func.WFLinkName === functionParam,
+        );
+        if (functionInfo) setActiveFn(functionInfo);
+      }
 
-    getProject(username);
-    setApp((prev: creatorApp) => ({ ...prev, lastCommit }));
-    if (error) toast.error("Error updating project committed time");
-  };
+      // commit
+      const commitParam = searchParams.get('commit');
+      const { data: commit } = await supabase
+        .from('commits')
+        .select()
+        .eq('projectId', project?.id)
+        .eq('id', commitParam)
+        .single();
+
+      if (commit) setActiveFn({ ...commit.function, commit });
+    },
+  });
+
+  const queryCommits = useQuery<any>({
+    queryKey: ['creator_workflows_commits', project?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('commits')
+        .select('*, users(*), projects(*)')
+        .eq('projectId', project?.id)
+        .eq('path', PATH_TAB)
+        .order('created_at', { ascending: false });
+
+      return {
+        arr: data,
+        obj: arr.groupInObj(data, 'functionId'),
+        pending: (data || []).filter((c: Commit) => c.status === 'pending'),
+      };
+    },
+  });
 
   const mutationRefreshCreator = useMutation({
     mutationFn: async () => {
-      if (!project) throw new Error("Project data is not available.");
+      if (!project) throw new Error('Project data is not available.');
 
-      const { data: accordian, error: errorAccordian } =
-        await creatorGetAppStructure(
-          project.domain,
-          project.creator?.config,
-          project.creator?.owner,
-          app?.name
-        );
+      const { data: accordian, error: errorAccordian } = await creatorGetAppStructure(
+        project.domain,
+        project.creator?.config,
+        project.creator?.owner,
+        app?.name,
+      );
 
       if (errorAccordian) throw errorAccordian;
 
@@ -103,7 +157,7 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                   project.creator?.config,
                   project.creator?.owner,
                   app?.name,
-                  workflow.WFLinkName
+                  workflow.WFLinkName,
                 );
 
                 return {
@@ -113,97 +167,148 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                 };
               } catch (error) {
                 console.error(
-                  "Error fetching workflow script for",
+                  'Error fetching workflow script for',
                   workflow.WFLinkName,
-                  error
+                  error,
                 );
                 return { ...workflow, script: null };
               }
-            })
+            }),
           );
 
           return workflowsWithCode;
-        })
+        }),
       );
 
       const flattenedWorkflows = accordianWithCode.flat();
 
       const { data, error } = await supabase
-        .from("creatorApps")
+        .from('creatorApps')
         .update({
-          id: project.crm?.id,
           accordian: flattenedWorkflows,
           lastSync: time.getTimestamptz(),
         })
-        .eq("creatorId", project.creator?.id)
-        .eq("name", app?.name)
+        .eq('creatorId', project.creator?.id)
+        .eq('name', app?.name)
         .select()
         .single();
 
-      if (error) throw new Error("Failed to update app accordian");
+      if (error) throw new Error('Failed to update app accordian');
 
       return data;
     },
     onSuccess: (data: creatorApp) => {
       setApp(data);
-      toast.success("App functions updated successfully.");
+      toast.success('App functions updated successfully.');
     },
     onError: (err) => {
-      toast.error(typeof err === "string" ? err : err?.message);
+      toast.error(typeof err === 'string' ? err : err?.message);
     },
   });
 
-  const { data, search, setSearch, setColumn } = useSearch({
+  const onCommitSuccess = async () => {
+    if (!app?.id) return;
+
+    const lastCommit = time.getTimestamptz();
+    const { error } = await supabase
+      .from('creatorApps')
+      .update({
+        lastCommit,
+      })
+      .eq('id', app.id);
+
+    await queryCommits.refetch();
+
+    await getProject(username);
+    setApp((prev: creatorApp) => ({ ...prev, lastCommit }));
+    if (error) toast.error('Error updating project committed time');
+  };
+
+  const {
+    data,
+    search,
+    setSearch,
+    filters,
+    setFilters,
+    filtersCount,
+    searchMatches,
+    setSearchMatches,
+  } = useFilters({
     data: app?.accordian,
-    searchKeys: ["script", "WFLinkName"],
-    groupBy: "report",
+    filterConfig: [
+      {
+        key: 'tags',
+        type: 'array',
+        matchFn: (data: any, value: string[]) => {
+          if (value.includes('empty_function')) return !data.script?.length;
+          const commits = queryCommits.data.obj[data.WFLinkName] || [];
+          if (value.includes('committed')) return commits?.length;
+          if (value.includes('pending_commits'))
+            return !!commits.filter((c: Commit) => c.status === 'pending')?.length;
+        },
+      },
+    ],
+    searchMatchFn: (data: any, searchValue: string) => {
+      return matchByWords(data, searchValue, ['WFName', 'script'], searchMatches);
+    },
   });
+  const functions = arr.groupInArr(data, 'report');
 
   return (
-    project?.creator && (
+    !!project?.creator &&
+    !!queryParams.isFetched &&
+    !!queryCommits.isFetched && (
       <>
         {/* Header */}
-        <div className="py-10 border-b">
-          <TypographyH2 className>Workflows</TypographyH2>
-          {/* Information & Buttons */}
-          <div className="flex items-center">
-            <div className="flex flex-col mt-4 gap-2">
-              <Description className="flex items-center gap-2">
-                <Parentheses className="size-3" />A total of{" "}
-                {app?.accordian?.length || 0} workflows
-              </Description>
-              <Description className="flex items-center gap-2">
-                <RefreshCcw className="size-3" />
-                Last sync occurred {time.timeAgo(app?.lastSync) || "-"}
-              </Description>
-              {project?.departments?.id === DEPARMENTS.FTE && (
-                <Description className="flex items-center gap-2">
-                  <ArrowUpFromLine className="size-3" />
-                  Last commit occurred {time.timeAgo(app?.lastCommit) || "-"}
-                </Description>
+        <AppTabHeader
+          label="Workflows"
+          description={
+            <>
+              <AppTabDescription icon={Parentheses}>
+                A total of {app?.accordian?.length || 0} workflows
+              </AppTabDescription>
+              <AppTabDescription icon={RefreshCcw}>
+                Last sync occurred {time.timeAgo(project?.crm?.lastSync) || '-'}
+              </AppTabDescription>
+              {!!project?._repository && project?.departments?.id === DEPARMENTS.FTE && (
+                <AppTabDescription icon={ArrowUpFromLine}>
+                  Last commit occurred {time.timeAgo(project?.crm?.lastCommit) || '-'}
+                </AppTabDescription>
               )}
-              {app?.lastCommit && (
-                <Description className="flex items-center gap-2 mt-4">
+              {!!project?._repository && !!app?.lastCommit && (
+                <Description className="mt-4 flex items-center gap-2">
                   <Link
                     target="_blank"
                     className="flex items-center gap-2"
-                    href={`https://bitbucket.org/lobadev/${project._repository}/src/master/creator/workflows`}
+                    href={`https://bitbucket.org/lobadev/${project._repositoryName}/src/master/${PATH_TAB}`}
                   >
                     Open Bitbucket Repository
                     <SquareArrowOutUpRight className="size-3" />
                   </Link>
                 </Description>
               )}
-            </div>
-            <div className="ml-auto flex items-center gap-3">
+            </>
+          }
+          right={
+            <>
               {project?.departments?.id === DEPARMENTS.FTE && (
-                <PushToGitButton
+                <ButtonPush
                   project={project}
-                  data={app?.accordian?.map((func: any) => ({
-                    folder: `creator/workflows/${func.WFName}.dg`,
-                    script: func.script,
-                  }))}
+                  commits={queryCommits.data.pending}
                   onSuccess={onCommitSuccess}
+                  functionscommitted={queryCommits.data.pending?.map(
+                    (commit: Commit) => ({
+                      folder: `${PATH_TAB}/${commit.function.WFName}.dg`,
+                      script: commit.function.script,
+                      commit: commit,
+                    }),
+                  )}
+                  functions={
+                    app?.accordian?.map((func: any) => ({
+                      folder: `${PATH_TAB}/${func.WFName}.dg`,
+                      script: func.script,
+                    })) || []
+                  }
                 />
               )}
               <ButtonLoading
@@ -213,88 +318,84 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
               >
                 <span>Sync</span>
               </ButtonLoading>
-            </div>
-          </div>
-        </div>
+            </>
+          }
+        />
         {/* Data */}
-        <div className="mt-10">
-          {app?.accordian?.length ? (
-            <div className="flex flex-col gap-4">
-              {/* Search / Columns */}
-              <div className="flex w-full gap-4">
-                <SearchInput
-                  placeholder="Search for function name or code"
-                  search={search}
-                  setSearch={setSearch}
-                />
-              </div>
-              {/* List / Code */}
-              <div className="grid grid-cols-3 gap-x-10 rounded-2xl">
+        {app?.accordian?.length ? (
+          <AppTabContent>
+            {/* Search / Columns */}
+            <AppTabContentHead>
+              <InputSearch
+                placeholder="Search for functions name or a code snippet"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                setSearchMatches={setSearchMatches}
+                searchMatches={{
+                  caseSensitive: searchMatches.caseSensitive,
+                  wholeWord: searchMatches.wholeWord,
+                }}
+              />
+              <PopoverFilters count={filtersCount}>
+                <div className="space-y-1.5">
+                  <Label>Tags</Label>
+                  <MultiSelect
+                    defaultValue={filters.tags}
+                    options={[
+                      {
+                        label: 'Empty function',
+                        value: 'empty_function',
+                        icon: TriangleAlert,
+                      },
+                      {
+                        label: 'Committed',
+                        value: 'committed',
+                        icon: ArrowUpFromLine,
+                      },
+                      {
+                        label: 'Ready to push',
+                        value: 'pending_commits',
+                        icon: ArrowUpFromLine,
+                      },
+                    ]}
+                    onValueChange={(e: any) => setFilters({ tags: e })}
+                    placeholder="Select tags"
+                    maxCount={3}
+                  />
+                </div>
+              </PopoverFilters>
+            </AppTabContentHead>
+            {data.length ? (
+              <AppTabContentBody>
+                {/* List */}
                 <div
                   className={cn(
-                    "flex flex-col text-sm gap-10",
-                    activeFunction ? "col-span-1" : "col-span-3"
+                    'flex flex-col gap-10 text-sm',
+                    activeFn ? 'col-span-1' : 'col-span-3',
                   )}
                 >
-                  {data.map(({ label, items }: any, index: any) => {
+                  {functions.map(({ label, items }: any, index: any) => {
                     return (
                       <Collapsible key={index} defaultOpen={true}>
                         <CardContainer>
-                          <div className="flex items-center w-full gap-2">
-                            <Parentheses className="size-4" />
-                            <span className="text-base">{label}</span>
-                            <span className="text-xs mt-[4px] text-muted-foreground">
-                              ( {items.length} )
-                            </span>
-
-                            <div className="ml-auto">
-                              <CollapsibleTrigger className="[data-state=open]:hidden">
-                                <ChevronsUpDown className="size-4" />{" "}
-                              </CollapsibleTrigger>
-                            </div>
-                          </div>
+                          <ListHeaderFunction label={label} length={items.length} />
                           <CollapsibleContent className="mt-4">
                             {items?.length > 0 && (
                               <div className="flex flex-col gap-2">
-                                {items.map(
-                                  (functionInfo: any, index: number) => {
-                                    return (
-                                      <Button
-                                        key={index}
-                                        variant={
-                                          functionInfo.WFLinkName ===
-                                          activeFunction?.WFLinkName
-                                            ? "outline"
-                                            : "ghost"
-                                        }
-                                        className="text-xs justify-start truncate border border-transparent"
-                                        onClick={() =>
-                                          setActiveFunction(functionInfo)
-                                        }
-                                      >
-                                        <span>
-                                          {str.decodeHtmlSpecialChars(
-                                            functionInfo.WFName
-                                          )}
-                                        </span>
-                                        <div className="ml-auto flex items-center gap-2">
-                                          {!functionInfo.script?.length && (
-                                            <TooltipProvider>
-                                              <Tooltip>
-                                                <TooltipTrigger>
-                                                  <Ban className="size-3 text-red-400" />
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                  No Code
-                                                </TooltipContent>
-                                              </Tooltip>
-                                            </TooltipProvider>
-                                          )}
-                                        </div>
-                                      </Button>
-                                    );
-                                  }
-                                )}
+                                {items.map((functionInfo: any, i: number) => {
+                                  return (
+                                    <ListItemFunction
+                                      key={i}
+                                      activeFn={activeFn}
+                                      setActiveFn={setActiveFn}
+                                      functionInfo={functionInfo}
+                                      functionName={functionInfo.WFName}
+                                      functionCode={functionInfo.script}
+                                      functionId={functionInfo.WFLinkName}
+                                      commitsObj={queryCommits.data.obj}
+                                    />
+                                  );
+                                })}
                               </div>
                             )}
                           </CollapsibleContent>
@@ -303,16 +404,29 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                     );
                   })}
                 </div>
-                {activeFunction && (
-                  <div className="bg-primary-foreground p-6 pt-0 col-span-2 rounded-2xl h-[calc(100vh-40px)] sticky top-4 overflow-auto">
-                    <div className="sticky top-0 w-full pt-4 flex items-center justify-between border-b pb-2 bg-primary-foreground">
+                {/* Code */}
+                {activeFn && (
+                  <CardContainer className="sticky top-4 col-span-2 h-[calc(100vh-40px)] overflow-auto pt-0">
+                    <div className="sticky top-0 flex w-full items-center justify-between border-b bg-primary-foreground pb-2 pt-4">
+                      {/* Header */}
                       <div className="flex flex-col">
-                        <TypographyH3>{activeFunction.WFName}</TypographyH3>
+                        <TypographyH3>{activeFn.WFName}</TypographyH3>
                       </div>
+                      {/* Buttons */}
                       <div className="flex items-center gap-1">
+                        <ButtonCommitsNew
+                          functionId={activeFn.WFLinkName}
+                          functionName={activeFn.WFName}
+                          functionInfo={activeFn}
+                          refetchCommits={queryCommits.refetch}
+                          path={PATH_TAB}
+                        />
+                        <ButtonCommitsHistory
+                          commits={queryCommits.data?.obj[activeFn.WFLinkName]}
+                        />
                         <Link
                           target="_blank"
-                          href={`https://bitbucket.org/lobadev/${project._repository}/src/master/creator/workflows/${activeFunction?.WFName}.dg`}
+                          href={`https://bitbucket.org/lobadev/${project._repositoryName}/src/master/${PATH_TAB}/${activeFn?.WFName}.dg`}
                         >
                           <Button variant="ghost" size="sm">
                             <ArrowUpRightFromSquare className="size-4" />
@@ -322,27 +436,27 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => setActiveFunction(null)}
+                          onClick={() => setActiveFn(null)}
                         >
                           <X className="size-4" />
                         </Button>
                       </div>
                     </div>
-                    <ScriptViewer
-                      className="w-full mt-2"
-                      script={activeFunction?.script}
-                    />
-                  </div>
+                    {/* Code */}
+                    <ScriptViewer className="mt-2 w-full" script={activeFn?.script} />
+                  </CardContainer>
                 )}
-              </div>
-            </div>
-          ) : (
-            <SectionMissing
-              icon={Frown}
-              message="No workflows have been added yet"
-            />
-          )}
-        </div>
+              </AppTabContentBody>
+            ) : (
+              // Empty data with filters
+              <SectionMissing icon={SearchX} message="No matching workflows found" />
+            )}
+          </AppTabContent>
+        ) : (
+          <AppTabContentMissing>
+            <SectionMissing icon={Frown} message="No workflows have been added yet" />
+          </AppTabContentMissing>
+        )}
       </>
     )
   );

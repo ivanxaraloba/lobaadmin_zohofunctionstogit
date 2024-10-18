@@ -1,0 +1,29 @@
+{
+  "printWidth": 90,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "plugins": ["@ianvs/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
+  "importOrder": [
+    "^react$",
+    "<BUILTIN_MODULES>",
+    "",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "/controllers/(.*)$",
+    "/pages/(.*)$",
+    "/components/(.*)$",
+    "/stores/(.*)$",
+    "/contexts/(.*)$",
+    "/hooks/(.*)$",
+    "/utils/(.*)$",
+    "/styles/(.*)$",
+    "/assets/(.*)$",
+    "",
+    "^[.]",
+    "",
+    "^(?!.*[.]css$)[./].*$",
+    ".css$"
+  ],
+  "importOrderTypeScriptVersion": "5.0.0",
+  "tailwindFunctions": ["clsx"]
+}

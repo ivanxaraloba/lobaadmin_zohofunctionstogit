@@ -1,55 +1,51 @@
-import { useState, useEffect, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from 'react';
+
+import { searchMatches } from '@/types/types';
+import { useSearchParams } from 'next/navigation';
 
 interface FilterConfig {
   key: string;
-  type: "text" | "number" | "array";
+  type: 'text' | 'number' | 'array';
   transformParams?: (value: any) => any;
   matchFn: (item: any, filterValue: any) => boolean;
 }
 
 interface UseFiltersProps {
-  data: any[];
+  data: any[] | undefined;
   filterConfig: FilterConfig[];
   searchMatchFn?: (item: any, searchValue: string) => boolean;
 }
 
-export function useFilters({
-  data,
-  filterConfig,
-  searchMatchFn,
-}: UseFiltersProps) {
-  const [search, setSearch] = useState("");
+export function useFilters({ data = [], filterConfig, searchMatchFn }: UseFiltersProps) {
+  const [search, setSearch] = useState('');
   const [filteredData, setFilteredData] = useState(data);
   const searchParams = useSearchParams();
 
-  // Initialize filters from search params
   const initializeFilters = useCallback(() => {
-    return filterConfig.reduce(
-      (acc: Record<string, any>, { key, transformParams }) => {
-        const searchValue = searchParams.get(key);
-        const initialValue = searchValue ? searchValue.split(",") : [];
-        acc[key] = transformParams
-          ? transformParams(initialValue)
-          : initialValue;
-        return acc;
-      },
-      {}
-    );
+    return filterConfig.reduce((acc: Record<string, any>, { key, transformParams }) => {
+      const searchValue = searchParams.get(key);
+      const initialValue = searchValue ? searchValue.split(',') : [];
+      acc[key] = transformParams ? transformParams(initialValue) : initialValue;
+      return acc;
+    }, {});
   }, [searchParams, filterConfig]);
 
-  const [filters, setFilters] = useState(initializeFilters);
+  const [filters, setFilters_] = useState(initializeFilters);
+  const setFilters = (updates: { [key: string]: any }) => {
+    setFilters_((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+  };
 
   useEffect(() => {
     const applyFilters = () => {
-      const searchLower = search?.toLowerCase() || "";
-
       return data.filter((item) => {
         if (
           search &&
           !(searchMatchFn
-            ? searchMatchFn(item, searchLower)
-            : item.name?.toLowerCase().includes(searchLower))
+            ? searchMatchFn(item, search || '')
+            : item.name?.toLowerCase().includes(search?.toLowerCase() || ''))
         ) {
           return false;
         }
@@ -68,13 +64,20 @@ export function useFilters({
     const filtered = applyFilters();
 
     // Only update state if filtered data is different
-    if (
-      filtered.length !== filteredData.length ||
-      filtered.some((item, index) => item !== filteredData[index])
-    ) {
+    if (filtered.length !== filteredData.length || filtered.some((item, index) => item !== filteredData[index])) {
       setFilteredData(filtered);
     }
   }, [data, search, filters, searchMatchFn, filterConfig]);
+
+  // search match
+  const [searchMatches, setSearchMatches_] = useState<searchMatches>({});
+
+  const setSearchMatches = (updates: { [key: string]: any }) => {
+    setSearchMatches_((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+  };
 
   return {
     search,
@@ -82,6 +85,8 @@ export function useFilters({
     filters,
     setFilters,
     data: filteredData,
-    count: Object.values(filters).filter((v: any) => v.length).length,
+    searchMatches,
+    setSearchMatches,
+    filtersCount: Object.values(filters).filter((v: any) => v.length).length,
   };
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export default function LogoCreator({ size = 18 }: { size: number }) {
   return (
@@ -9,12 +9,9 @@ export default function LogoCreator({ size = 18 }: { size: number }) {
       height={size}
       viewBox="0 0 1024.000000 1024.000000"
       preserveAspectRatio="xMidYMid meet"
-      className="fill-current stroke-current text-black dark:text-white dark:stroke-gray-400"
+      className="fill-current stroke-current text-black dark:stroke-gray-400 dark:text-white"
     >
-      <g
-        transform="translate(0.000000,1024.000000) scale(0.100000,-0.100000)"
-        stroke="none"
-      >
+      <g transform="translate(0.000000,1024.000000) scale(0.100000,-0.100000)" stroke="none">
         <path
           d="M5199 10031 c-226 -24 -442 -106 -629 -240 -65 -46 -602 -578 -2301
    -2278 -1994 -1995 -2218 -2224 -2240 -2273 -32 -75 -32 -175 1 -245 19 -41

@@ -1,16 +1,7 @@
-import { cn } from "@/lib/utils";
-import React from "react";
+import React from 'react';
 
-export default function CardContainer({
-  children,
-  className,
-}: {
-  children: any;
-  className?: string;
-}) {
-  return (
-    <div className={cn("bg-primary-foreground p-6 rounded-2xl border", className)}>
-      {children}
-    </div>
-  );
+import { cn } from '@/lib/utils';
+
+export default function CardContainer({ children, className }: { children: any; className?: string }) {
+  return <div className={cn('rounded-2xl border bg-primary-foreground p-6', className)}>{children}</div>;
 }

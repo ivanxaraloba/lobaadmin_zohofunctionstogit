@@ -1,9 +1,8 @@
-"use client";
+'use client';
 
-import DialogSearch from "@/components/shared/dialog-search";
-import { useGlobalStore } from "@/stores/global";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useQuery } from '@tanstack/react-query';
+
+import { useGlobalStore } from '@/stores/global';
 
 export default function RootLayout({
   children,
@@ -13,23 +12,18 @@ export default function RootLayout({
   const { getProjects, getDepartments } = useGlobalStore();
 
   useQuery<any>({
-    queryKey: ["projects"],
+    queryKey: ['projects'],
     queryFn: async () => {
       return getProjects();
     },
   });
 
   useQuery<any>({
-    queryKey: ["departments"],
+    queryKey: ['departments'],
     queryFn: async () => {
       return getDepartments();
     },
   });
 
-  return (
-    <div className="">
-      <DialogSearch />
-      {children}
-    </div>
-  );
+  return <div className="">{children}</div>;
 }

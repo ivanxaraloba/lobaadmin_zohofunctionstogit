@@ -1,17 +1,17 @@
-"use server";
-import axios from "axios";
+'use server';
+
+import axios from 'axios';
 
 export const creatorGetAppStructure = async (domain, config, owner, name) => {
   console.log(domain, config, owner, name);
   try {
-    if (!config?.cookie || !config["user-agent"])
-      throw new Error("Config is missing");
+    if (!config?.cookie || !config['user-agent']) throw new Error('Config is missing');
 
     const response = await axios.get(
       `https://creator.zoho.${domain}/appbuilder/${owner}/${name}/fetchAccordian`,
       {
         headers: config,
-      }
+      },
     );
 
     const functions = response.data;
@@ -20,7 +20,7 @@ export const creatorGetAppStructure = async (domain, config, owner, name) => {
         map[workflow.WFLinkName] = workflow;
         return map;
       },
-      {}
+      {},
     );
 
     const reportsGroupedByForm = functions.reports.reduce((acc, report) => {
@@ -32,7 +32,7 @@ export const creatorGetAppStructure = async (domain, config, owner, name) => {
     const formData = Object.keys(functions.formToReport).map((formName) => {
       const reports = reportsGroupedByForm[formName] || [];
       const workflows = (functions.formToWorkflow[formName] || []).map(
-        (workflowName) => workflowMap[workflowName]
+        (workflowName) => workflowMap[workflowName],
       );
 
       return {
@@ -48,13 +48,7 @@ export const creatorGetAppStructure = async (domain, config, owner, name) => {
   }
 };
 
-export const creatorGetFunction = async (
-  domain,
-  config,
-  owner,
-  name,
-  workflow
-) => {
+export const creatorGetFunction = async (domain, config, owner, name, workflow) => {
   const formData = new FormData();
 
   const extractToken = (str, key) => {
@@ -63,8 +57,8 @@ export const creatorGetFunction = async (
     return match ? match[1] : null;
   };
 
-  formData.append("workflowLinkName", workflow);
-  formData.append("zccpn", extractToken(config.cookie, "CSRF_TOKEN"));
+  formData.append('workflowLinkName', workflow);
+  formData.append('zccpn', extractToken(config.cookie, 'CSRF_TOKEN'));
 
   try {
     const response = await axios.post(
@@ -72,7 +66,7 @@ export const creatorGetFunction = async (
       formData,
       {
         headers: config,
-      }
+      },
     );
     return response.data;
   } catch (err) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export default function LogoLoba() {
   return (
@@ -7,7 +7,7 @@ export default function LogoLoba() {
       height="20"
       viewBox="0 0 37 41"
       xmlns="http://www.w3.org/2000/svg"
-      className="fill-current stroke-current text-black dark:text-white dark:stroke-gray-400"
+      className="fill-current stroke-current text-black dark:stroke-gray-400 dark:text-white"
     >
       <path
         fillRule="evenodd"

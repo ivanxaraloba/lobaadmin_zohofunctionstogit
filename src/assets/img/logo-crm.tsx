@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export default function LogoCrm({ size = 20 }: any) {
   return (
@@ -9,12 +9,9 @@ export default function LogoCrm({ size = 20 }: any) {
       height={size}
       viewBox="0 0 256.000000 256.000000"
       preserveAspectRatio="xMidYMid meet"
-      className="fill-current stroke-current text-black dark:text-white dark:stroke-gray-400"
+      className="fill-current stroke-current"
     >
-      <g
-        transform="translate(0.000000,256.000000) scale(0.100000,-0.100000)"
-        stroke="none"
-      >
+      <g transform="translate(0.000000,256.000000) scale(0.100000,-0.100000)" stroke="none">
         <path
           d="M625 2063 c-86 -18 -216 -78 -300 -138 -223 -159 -351 -457 -317
 -738 40 -324 252 -578 567 -677 144 -46 435 -34 489 19 25 25 25 75 0 102 -21

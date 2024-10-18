@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export default function LogoRecruit({ size = 20 }) {
   return (
@@ -9,12 +9,9 @@ export default function LogoRecruit({ size = 20 }) {
       height={size}
       viewBox="0 0 512.000000 512.000000"
       preserveAspectRatio="xMidYMid meet"
-      className="fill-current stroke-current text-black dark:text-white dark:stroke-gray-400"
+      className="fill-current stroke-current text-black dark:stroke-gray-400 dark:text-white"
     >
-      <g
-        transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-        stroke="none"
-      >
+      <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" stroke="none">
         <path
           d="M2410 5114 c-527 -46 -971 -245 -1337 -597 -186 -179 -319 -360 -433
 -590 -151 -304 -221 -603 -221 -947 -1 -266 28 -450 107 -688 113 -339 275

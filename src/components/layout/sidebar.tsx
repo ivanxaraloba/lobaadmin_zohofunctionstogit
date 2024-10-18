@@ -1,25 +1,27 @@
-import LogoLoba from "@/assets/img/logo-loba";
-import { supabase } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
-import { useTheme } from "@/providers/theme";
-import { LogOut, SunMoon } from "lucide-react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import React from "react";
+import React from 'react';
+
+import { cn } from '@/lib/utils';
+import { useTheme } from '@/providers/theme';
+import { LogOut, Search, SunMoon } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+
+import { signOut } from '@/utils/authentication';
+import LogoLoba from '@/assets/img/logo-loba';
 
 const Button = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button {...props} />
 );
 
-export function SidebarItem({ children, to = "", className, onClick }: any) {
+export function SidebarItem({ children, to = '', className, onClick }: any) {
   const Comp = onClick ? Button : Link;
 
   return (
     <Comp
       href={to}
       className={cn(
-        "h-12 aspect-square items-center flex gap-2 justify-start px-4 text-sm hover:bg-secondary rounded-md",
-        className
+        'flex aspect-square h-12 items-center justify-start gap-2 rounded-md px-4 text-sm hover:bg-secondary',
+        className,
       )}
       // @ts-ignore
       onClick={onClick}
@@ -48,38 +50,33 @@ export default function Sidebar({
   const pathname = usePathname();
 
   return (
-    <div className="border-r fixed h-screen">
-      <div className={cn("px-2 py-8 h-full", onlyIcons ? "w-[68px]" : "w-52")}>
-        <div className="flex flex-col w-full h-full">
+    <div className="fixed h-screen border-r">
+      <div className={cn('h-full px-2 py-8', onlyIcons ? 'w-[68px]' : 'w-52')}>
+        <div className="flex h-full w-full flex-col">
           <SidebarItem className="hover:bg-transparent" to="/projects">
             <LogoLoba />
           </SidebarItem>
-          <div className="flex flex-col mt-5 gap-1">
+          <div className="mt-5 flex flex-col gap-1">
             {routes.map((item: any, index: number) => (
               <SidebarItem
                 key={item.to}
-                className={cn(
-                  pathname === item.to && "bg-secondary",
-                  item.className
-                )}
+                className={cn(pathname === item.to && 'bg-secondary', item.className)}
                 to={item.to}
               >
-                <item.icon className="size-5" strokeWidth={1.5} />
+                <item.icon
+                  className={cn('size-5', item.classNameIcon)}
+                  strokeWidth={1.5}
+                />
                 {!onlyIcons && <span className="font-medium">{item.name}</span>}
               </SidebarItem>
             ))}
           </div>
-          <div className="flex flex-col mt-auto">
+          <div className="mt-auto flex flex-col">
             <SidebarItem onClick={toggleTheme}>
               <SunMoon className="size-5" strokeWidth={1.5} />
               {!onlyIcons && <span className="font-medium">Theme</span>}
             </SidebarItem>
-            <SidebarItem
-              onClick={async () => {
-                await supabase.auth.signOut();
-                router.push("/login");
-              }}
-            >
+            <SidebarItem onClick={() => signOut()}>
               <LogOut className="size-5" strokeWidth={1.5} />
               {!onlyIcons && <span className="font-medium">Logout</span>}
             </SidebarItem>

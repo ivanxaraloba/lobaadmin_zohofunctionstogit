@@ -1,22 +1,20 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 
 // @ts-ignore
-import Prism from "prismjs";
-import "prismjs/themes/prism.css";
-import "@/assets/styles/code-viewer.css";
-import { cn } from "@/lib/utils";
+import Prism from 'prismjs';
+
+import 'prismjs/themes/prism.css';
+import '@/assets/styles/code-viewer.css';
+
+import { cn } from '@/lib/utils';
 
 interface ScriptViewerProps {
   className?: string;
   script?: string;
-  language?: "deluge" | "language";
+  language?: 'deluge' | 'language';
 }
 
-const ScriptViewer: React.FC<ScriptViewerProps> = ({
-  script = "",
-  language = "deluge",
-  className,
-}) => {
+const ScriptViewer: React.FC<ScriptViewerProps> = ({ script = '', language = 'deluge', className }) => {
   useEffect(() => {
     Prism.highlightAll();
   }, [script, language]);

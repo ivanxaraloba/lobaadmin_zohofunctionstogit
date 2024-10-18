@@ -1,20 +1,29 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useEffect, useState } from 'react';
 
-import { useRouter } from "next/navigation";
-import { TypographyH1 } from "@/components/typography/typography-h1";
-import ButtonLoading from "@/components/ui/button-loading";
-import {
-  Check,
-  Parentheses,
-  Settings,
-  SquareArrowOutUpRight,
-  Trash,
-} from "lucide-react";
+import { getRepository, updateRepository } from '@/helpers/bitbucket';
+import { supabase } from '@/lib/supabase/client';
+import { Project } from '@/types/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { Check, Parentheses, Settings, SquareArrowOutUpRight, Trash } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
+import CardContainer from '@/components/shared/card-container';
+import DialogConfirmation from '@/components/shared/dialog-confirmation';
+import LoadingScreen from '@/components/shared/loading-screen';
+import { TypographyH1 } from '@/components/typography/typography-h1';
+import { TypographyH2 } from '@/components/typography/typography-h2';
+import { TypographyH3 } from '@/components/typography/typography-h3';
+import { Button } from '@/components/ui/button';
+import ButtonLoading from '@/components/ui/button-loading';
+import { Combobox } from '@/components/ui/combobox';
+import Description from '@/components/ui/description';
 import {
   Form,
   FormControl,
@@ -23,34 +32,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { ButtonNavTabs } from '@/components/vercel/button-nav-tabs';
+import { useGlobalStore } from '@/stores/global';
+import { useProjectStore } from '@/stores/project';
+import { str } from '@/utils/generic';
+import LogoRecruit from '@/assets/img/logo-recruit';
 
-import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase/client";
-import { useProjectStore } from "@/stores/project";
-import { str } from "@/utils/generic";
-import CardContainer from "@/components/shared/card-container";
-import { TypographyH2 } from "@/components/typography/typography-h2";
-import { TypographyH3 } from "@/components/typography/typography-h3";
-import LoadingScreen from "@/components/shared/loading-screen";
-import Description from "@/components/ui/description";
-import LogoRecruit from "@/assets/img/logo-recruit";
-import { ButtonNavTabs } from "@/components/vercel/button-nav-tabs";
-import { useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Combobox } from "@/components/ui/combobox";
-import { useGlobalStore } from "@/stores/global";
-import { Project } from "@/types/types";
-import {
-  bitbucketGetRepository,
-  bitbucketUpdateRepositoryName,
-} from "@/helpers/bitbucket";
-import Link from "next/link";
-import DialogConfirmation from "@/components/shared/dialog-confirmation";
-import { Button } from "@/components/ui/button";
-
-const TABS = [{ id: "functions", label: "Project Settings" }];
+const TABS = [{ id: 'functions', label: 'Project Settings' }];
 
 const formSchema = z.object({
   name: z.string().min(3),
@@ -61,70 +51,57 @@ const formSchema = z.object({
 
 export default function Page() {
   const router = useRouter();
-  const { user, departments } = useGlobalStore();
+  const { departments } = useGlobalStore();
   const { project, getProject } = useProjectStore();
   const [activeTab, setActiveTab] = useState<string>(TABS[0].id);
 
-  const auth = {
-    username: user?.profile?.bbUsername,
-    password: user?.profile?.bbPassword,
-  };
-
   const form = useForm<z.infer<typeof formSchema>>({
-    mode: "onChange",
+    mode: 'onChange',
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      username: "",
-      domain: "",
+      name: '',
+      username: '',
+      domain: '',
       departmentId: undefined,
     },
   });
 
   const mutationDeleteProject = useMutation({
     mutationFn: async () => {
-      if (!project) throw new Error("Project data is not available");
+      if (!project) throw new Error('Project data is not available');
 
-      const { error } = await supabase
-        .from("projects")
-        .delete()
-        .eq("id", project.id);
+      const { error } = await supabase.from('projects').delete().eq('id', project.id);
       if (error) throw error;
     },
     onSuccess: () => {
-      router.push("/");
-      toast.success("Project deleted successfully!");
+      router.push('/');
+      toast.success('Project deleted successfully!');
     },
     onError: (err) => {
-      toast.error(err.message || "Error");
+      toast.error(err.message || 'Error');
     },
   });
 
   const mutationUpdateProject = useMutation({
     mutationFn: async (data: Project) => {
-      if (
-        data.username !== project?.username ||
-        data.domain !== project?.domain
-      ) {
-        const repository = await bitbucketGetRepository(
-          auth,
-          project?._repository
-        );
+      if (!project) throw new Error('Project data is not available');
+
+      if (data.username !== project?.username || data.domain !== project?.domain) {
+        const { data: repository } = await getRepository(project?._repositoryName);
 
         if (repository) {
-          const { error } = await bitbucketUpdateRepositoryName(
-            auth,
-            project?._repository,
-            `lobaz2g-${data.domain}-${data.username}`
+          const { error } = await updateRepository(
+            project?._repositoryName,
+            `lobaz2g-${data.domain}-${data.username}`,
           );
           if (error) throw new Error(error.message);
         }
       }
 
       const { error } = await supabase
-        .from("projects")
+        .from('projects')
         .update(data)
-        .eq("id", project?.id);
+        .eq('id', project?.id);
 
       if (error) throw error;
 
@@ -133,11 +110,11 @@ export default function Page() {
     onSuccess: async (username: any) => {
       const redirect = username !== project?.username;
       getProject(username);
-      toast.success("Project updated successfully!");
+      toast.success('Project updated successfully!');
       if (redirect) router.push(`/projects/${username}`);
     },
     onError: (err) => {
-      toast.error(err.message || "Error loading file");
+      toast.error(err.message || 'Error loading file');
     },
   });
 
@@ -156,7 +133,7 @@ export default function Page() {
       {!project && <LoadingScreen />}
       {project && (
         <div className="flex flex-col">
-          <div className="flex items-center gap-4 text-xs pb-10">
+          <div className="flex items-center gap-4 pb-10 text-xs">
             <TypographyH1>{project.name}</TypographyH1>
           </div>
           <div className="flex flex-col">
@@ -167,34 +144,31 @@ export default function Page() {
               springy
             />
             {/* Header */}
-            <div className="py-10 border-b">
+            <div className="border-b py-10">
               <TypographyH2>Project Settings</TypographyH2>
               <div className="flex items-center">
-                <div className="flex flex-col mt-4 gap-2">
-                  <Description className="flex items-center gap-2 mt-4">
+                {project?._repository && (
+                  <Description className="mt-4 flex items-center gap-2">
                     <Link
                       target="_blank"
                       className="flex items-center gap-2"
-                      href={`https://bitbucket.org/lobadev/${project._repository}/src/master/crm/functions`}
+                      href={`https://bitbucket.org/lobadev/${project._repositoryName}/src/master/crm/functions`}
                     >
                       Open Bitbucket Repository
                       <SquareArrowOutUpRight className="size-3" />
                     </Link>
                   </Description>
-                </div>
+                )}
               </div>
             </div>
             {/* Data */}
             <div className="mt-10">
               <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-10"
-                >
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
                   {/* basic information */}
                   <CardContainer className="flex flex-col rounded-lg">
                     <TypographyH3>Basic Information</TypographyH3>
-                    <div className="space-y-3 mt-6">
+                    <div className="mt-6 space-y-3">
                       <FormField
                         control={form.control}
                         name="name"
@@ -234,10 +208,9 @@ export default function Page() {
                   <CardContainer className="flex flex-col rounded-lg">
                     <TypographyH3>Username / Domain</TypographyH3>
                     <FormDescription>
-                      Modifying this data will apply the name change to the Git
-                      repository
+                      Modifying this data will apply the name change to the Git repository
                     </FormDescription>
-                    <div className="space-y-3 mt-6">
+                    <div className="mt-6 space-y-3">
                       <FormField
                         control={form.control}
                         name="username"
@@ -265,7 +238,7 @@ export default function Page() {
                             <FormControl>
                               <Combobox
                                 variant="outline"
-                                items={["eu", "com"].map((i) => ({
+                                items={['eu', 'com'].map((i) => ({
                                   label: i,
                                   value: i,
                                 }))}
@@ -280,21 +253,16 @@ export default function Page() {
 
                     <Description className="mt-2">
                       lobaz2g-
-                      <span className="text-primary">
-                        {form.watch("domain")}
-                      </span>
-                      -
-                      <span className="text-primary">
-                        {form.watch("username")}
-                      </span>
+                      <span className="text-primary">{form.watch('domain')}</span>-
+                      <span className="text-primary">{form.watch('username')}</span>
                     </Description>
                   </CardContainer>
-                  <div className="flex items-center justify-end gap-4 mt-10">
+                  <div className="mt-10 flex items-center justify-end gap-4">
                     <DialogConfirmation
                       button={
                         <Button variant="destructive" type="button">
                           <span>Delete</span>
-                          <Trash className="size-4 ml-2" />
+                          <Trash className="ml-2 size-4" />
                         </Button>
                       }
                       action={() => mutationDeleteProject.mutate()}

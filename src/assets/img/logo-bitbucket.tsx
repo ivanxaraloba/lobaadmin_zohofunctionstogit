@@ -1,17 +1,12 @@
-import { cn } from "@/lib/utils";
-import React from "react";
+import React from 'react';
+
+import { cn } from '@/lib/utils';
 
 export default function LogoBitbucket({ className }: any) {
   return (
     <svg className={cn(className)} height="20" viewBox="-2 -2 65 59" width="20">
       <defs>
-        <linearGradient
-          id="bitbucket-:r2k:"
-          x1="104.953%"
-          x2="46.569%"
-          y1="21.921%"
-          y2="75.234%"
-        >
+        <linearGradient id="bitbucket-:r2k:" x1="104.953%" x2="46.569%" y1="21.921%" y2="75.234%">
           <stop offset="7%" stopColor="currentColor"></stop>
           <stop offset="100%" stopColor="currentColor"></stop>
         </linearGradient>

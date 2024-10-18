@@ -1,5 +1,6 @@
-import { arr } from "@/utils/generic";
-import { useState } from "react";
+import { useState } from 'react';
+
+import { arr } from '@/utils/generic';
 
 export function useSearch<T>({
   data = [],
@@ -11,7 +12,7 @@ export function useSearch<T>({
   groupBy: string;
 }) {
   const [search, setSearch] = useState({
-    text: "",
+    text: '',
     caseSensitive: false,
     wholeWord: false,
   });
@@ -19,29 +20,22 @@ export function useSearch<T>({
   if (!data) data = [];
 
   data = data.filter((item) => {
-    let searchValue = search.text || "";
+    let searchValue = search.text || '';
     if (!searchValue) return true;
 
-    const searchKeysArray = Array.isArray(searchKeys)
-      ? searchKeys
-      : [searchKeys];
+    const searchKeysArray = Array.isArray(searchKeys) ? searchKeys : [searchKeys];
 
-    const primaryValues = searchKeysArray.map(
-      (key) => item[key] as unknown as string
-    );
+    const primaryValues = searchKeysArray.map((key) => item[key] as unknown as string);
 
     let filteredValues = primaryValues;
 
     if (!search.caseSensitive) {
-      filteredValues = filteredValues.map((val) => val?.toLowerCase() || "");
+      filteredValues = filteredValues.map((val) => val?.toLowerCase() || '');
       searchValue = searchValue.toLowerCase();
     }
 
     if (search.wholeWord) {
-      const regex = new RegExp(
-        `\\b${searchValue}\\b`,
-        search.caseSensitive ? "" : "i"
-      );
+      const regex = new RegExp(`\\b${searchValue}\\b`, search.caseSensitive ? '' : 'i');
       return filteredValues.some((val) => regex.test(val));
     }
 
@@ -52,9 +46,7 @@ export function useSearch<T>({
   const setColumn = (columnKey: string, value: any) => {
     // @ts-ignore
     setColumns((prevColumns: any) => {
-      const columnIndex = prevColumns.findIndex(
-        (column: any) => column.key === columnKey
-      );
+      const columnIndex = prevColumns.findIndex((column: any) => column.key === columnKey);
       if (columnIndex > -1) {
         // Update existing column value
         const updatedColumns = [...prevColumns];

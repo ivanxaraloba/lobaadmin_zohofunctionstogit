@@ -1,29 +1,21 @@
-import { usePushToGit } from "@/hooks/usePushToGit";
-import { ArrowUpFromLine } from "lucide-react";
-import ButtonLoading from "../ui/button-loading";
+import { useEffect, useState } from 'react';
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "../ui/input";
-import { useEffect, useState } from "react";
+import { ArrowUpFromLine } from 'lucide-react';
 
-interface PushToGitButtonProps {
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { usePushToGit } from '@/hooks/usePushToGit';
+
+import ButtonLoading from '../ui/button-loading';
+import { Input } from '../ui/input';
+
+interface Props {
   project: any;
   data: { folder: string; script: string }[];
   onSuccess?: () => Function | Promise<void>;
 }
 
-export const PushToGitButton: React.FC<PushToGitButtonProps> = ({
-  project,
-  data,
-  onSuccess = async () => {},
-}) => {
-  const [message, setMessage] = useState("");
+export const PushToGitButton: React.FC<Props> = ({ project, data, onSuccess = async () => {} }) => {
+  const [message, setMessage] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const mutationPushToGit = usePushToGit({
     project,
@@ -38,11 +30,7 @@ export const PushToGitButton: React.FC<PushToGitButtonProps> = ({
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <ButtonLoading
-          variant="secondary"
-          icon={ArrowUpFromLine}
-          onClick={() => setIsDialogOpen(true)}
-        >
+        <ButtonLoading variant="secondary" icon={ArrowUpFromLine} onClick={() => setIsDialogOpen(true)}>
           <span>Push to Git</span>
         </ButtonLoading>
       </DialogTrigger>
@@ -50,11 +38,7 @@ export const PushToGitButton: React.FC<PushToGitButtonProps> = ({
         <DialogHeader>
           <DialogTitle>Commit message</DialogTitle>
         </DialogHeader>
-        <Input
-          type="text"
-          placeholder="Your commit message"
-          onChange={(e) => setMessage(e.target.value)}
-        />
+        <Input type="text" placeholder="Your commit message" onChange={(e) => setMessage(e.target.value)} />
         <ButtonLoading
           icon={ArrowUpFromLine}
           loading={mutationPushToGit.isPending}

@@ -1,16 +1,18 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useProjectStore } from "@/stores/project";
-import HeaderProject from "@/components/layout/header-project";
-import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { LayoutDashboard } from "lucide-react";
-import LogoCrm from "@/assets/img/logo-crm";
-import LogoCreator from "@/assets/img/logo-creator";
-import Sidebar from "@/components/layout/sidebar";
-import LogoRecruit from "@/assets/img/logo-recruit";
-import { cn } from "@/lib/utils";
+import { useEffect } from 'react';
+
+import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
+import { LayoutDashboard } from 'lucide-react';
+import { useParams } from 'next/navigation';
+
+import HeaderProject from '@/components/layout/header-project';
+import Sidebar from '@/components/layout/sidebar';
+import { useProjectStore } from '@/stores/project';
+import LogoCreator from '@/assets/img/logo-creator';
+import LogoCrm from '@/assets/img/logo-crm';
+import LogoRecruit from '@/assets/img/logo-recruit';
 
 export default function RootLayout({
   children,
@@ -18,11 +20,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const { username } = useParams<{ username: string }>();
-  const { project, getProject } = useProjectStore();
+  const { project, getProject, resetProject } = useProjectStore();
 
   useQuery<any>({
-    queryKey: ["project", username],
+    queryKey: ['project', username],
     queryFn: async () => {
+      resetProject();
       return getProject(username);
     },
   });
@@ -36,21 +39,22 @@ export default function RootLayout({
       icon: LogoCrm,
       to: `/projects/${username}/crm`,
       disabled: !project?.crm,
-      className: cn(!project?.crm && "opacity-40"),
+      className: cn(!project?.crm && 'opacity-40'),
     },
     {
       icon: LogoCreator,
       to: `/projects/${username}/creator`,
       disabled: !project?.creator,
-      className: cn(!project?.creator && "opacity-40"),
+      className: cn(!project?.creator?.creatorApps?.length && 'opacity-40'),
     },
     {
       icon: LogoRecruit,
       to: `/projects/${username}/recruit`,
       disabled: !project?.recruit,
-      className: cn(!project?.recruit && "opacity-40"),
+      className: cn(!project?.recruit && 'opacity-40'),
     },
-  ].sort((a, b) => (a.disabled ? 1 : 0) - (b.disabled ? 1 : 0));
+  ];
+  // .sort((a, b) => (a.disabled ? 1 : 0) - (b.disabled ? 1 : 0));
 
   return (
     <div className="">

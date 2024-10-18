@@ -1,24 +1,24 @@
-pre[class*="language-"] {
+pre[class*='language-'] {
   background: none;
   padding: 0;
   margin: 0;
   font-size: 12px;
 }
 
-code[class*="language-"],
-pre[class*="language-"] {
+code[class*='language-'],
+pre[class*='language-'] {
   text-shadow: none;
 }
 
 /* Light mode */
-.deluge pre[class*="language-"],
-.deluge code[class*="language-"] {
+.deluge pre[class*='language-'],
+.deluge code[class*='language-'] {
   color: #5e57b5;
 }
 
 /* Dark mode */
-html.dark .deluge pre[class*="language-"],
-html.dark .deluge code[class*="language-"] {
+html.dark .deluge pre[class*='language-'],
+html.dark .deluge code[class*='language-'] {
   color: #b5c2ff;
 }
 

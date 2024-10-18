@@ -1,11 +1,11 @@
-import { formatDistanceToNow } from "date-fns";
-import { formatInTimeZone } from "date-fns-tz";
-import { pt } from "date-fns/locale";
+import { formatDistanceToNow } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
+import { pt } from 'date-fns/locale';
 
 export const arr = {
   groupInObj: (array, key) => {
     return array.reduce((acc, obj) => {
-      const keyParts = key.split(".");
+      const keyParts = key.split('.');
 
       const keyValue = keyParts.reduce((value, part) => {
         return value ? value[part] : undefined;
@@ -22,7 +22,7 @@ export const arr = {
   },
   groupInArr: (array, key) => {
     const grouped = array.reduce((acc, obj) => {
-      const keyParts = key.split(".");
+      const keyParts = key.split('.');
       const keyValue = keyParts.reduce((value, part) => {
         return value ? value[part] : undefined;
       }, obj);
@@ -46,22 +46,16 @@ export const arr = {
   },
   sortBy: (arr, key) => {
     return arr.sort((a, b) => {
-      const keyPath = key.split("."); // Split the key path into parts
+      const keyPath = key.split('.'); // Split the key path into parts
 
       // Get the value at the nested key path for object 'a'
-      const aValue = keyPath.reduce(
-        (obj, prop) => (obj ? obj[prop] : undefined),
-        a
-      );
+      const aValue = keyPath.reduce((obj, prop) => (obj ? obj[prop] : undefined), a);
 
       // Get the value at the nested key path for object 'b'
-      const bValue = keyPath.reduce(
-        (obj, prop) => (obj ? obj[prop] : undefined),
-        b
-      );
+      const bValue = keyPath.reduce((obj, prop) => (obj ? obj[prop] : undefined), b);
 
       // Compare values using localeCompare if they are strings, otherwise use subtraction for numbers
-      if (typeof aValue === "string" && typeof bValue === "string") {
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
         return aValue.localeCompare(bValue);
       } else {
         return (aValue > bValue) - (aValue < bValue); // Handle other types (numbers, dates, etc.)
@@ -86,20 +80,16 @@ export const arr = {
 };
 
 export const obj = {
-  findToken: (obj, findName, filterString = "") => {
-    let result = "";
+  findToken: (obj, findName, filterString = '') => {
+    let result = '';
 
     function search(item) {
       if (Array.isArray(item)) {
         for (const element of item) {
           search(element);
         }
-      } else if (item !== null && typeof item === "object") {
-        if (
-          item.name === findName &&
-          (filterString === "" ||
-            (item.value && item.value.includes(filterString)))
-        ) {
+      } else if (item !== null && typeof item === 'object') {
+        if (item.name === findName && (filterString === '' || (item.value && item.value.includes(filterString)))) {
           result = item.value;
           return;
         }
@@ -132,7 +122,7 @@ export const files = {
       };
 
       reader.onerror = () => {
-        reject(new Error("Error reading file"));
+        reject(new Error('Error reading file'));
       };
 
       reader.readAsText(file);
@@ -142,19 +132,18 @@ export const files = {
 
 export const str = {
   slugify: (str) => {
-    str = str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // remove diacritics ( "ã", "é" ...)
-    str = str.replace(/^\s+|\s+$/g, ""); // trim leading/trailing white space
+    str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // remove diacritics ( "ã", "é" ...)
+    str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
     str = str.toLowerCase(); // convert string to lowercase
     str = str
-      .replace(/[^a-z0-9 -]/g, "") // remove any non-alphanumeric characters
-      .replace(/\s+/g, "") // replace spaces with hyphens
-      .replace(/-+/g, ""); // remove consecutive hyphens
+      .replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
+      .replace(/\s+/g, '') // replace spaces with hyphens
+      .replace(/-+/g, ''); // remove consecutive hyphens
     return str;
   },
   decodeHtmlSpecialChars: (str) => {
     const parser = new DOMParser();
-    const decodedString = parser.parseFromString(str, "text/html")
-      .documentElement.textContent;
+    const decodedString = parser.parseFromString(str, 'text/html').documentElement.textContent;
     return decodedString;
   },
 };
@@ -176,16 +165,11 @@ export const time = {
     return result;
   },
   getTimestamptz: () => {
-    return formatInTimeZone(
-      new Date(),
-      "Europe/Lisbon",
-      "yyyy-MM-dd'T'HH:mm:ss"
-    );
+    return formatInTimeZone(new Date(), 'Europe/Lisbon', "yyyy-MM-dd'T'HH:mm:ss");
   },
   fixTime: (datetime) => {
     return new Date(datetime).setTime(
-      new Date(datetime).getTime() +
-        new Date(datetime).getTimezoneOffset() * 60 * 1000
+      new Date(datetime).getTime() + new Date(datetime).getTimezoneOffset() * 60 * 1000,
     );
   },
 };

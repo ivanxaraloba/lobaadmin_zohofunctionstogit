@@ -1,11 +1,16 @@
-"use client";
+'use client';
 
-import { useProjectStore } from "@/stores/project";
-import { Button } from "@/components/ui/button";
-import { ChevronsUpDown } from "lucide-react";
-import { Combobox } from "../ui/combobox";
-import { useGlobalStore } from "@/stores/global";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+
+import { ChevronsUpDown, Command, Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
+import { Button } from '@/components/ui/button';
+import { useGlobalStore } from '@/stores/global';
+import { useProjectStore } from '@/stores/project';
+
+import DialogSearch from '../shared/dialog-search';
+import { Combobox } from '../ui/combobox';
 
 const Slash = () => {
   return (
@@ -30,15 +35,14 @@ export default function HeaderProject() {
   const router = useRouter();
   const { projects } = useGlobalStore();
   const { project } = useProjectStore();
+  const [openDialog, setOpenDialog] = useState(false);
 
   return (
-    <div className="h-12 px-10 w-full gap-1 flex items-center border-b">
+    <div className="flex h-12 w-full items-center gap-1 border-b px-10">
       <Button
         variant="ghost"
         size="sm"
-        onClick={() =>
-          router.push(`/projects?departments=${project?.departments.id}`)
-        }
+        onClick={() => router.push(`/projects?departments=${project?.departments.id}`)}
       >
         {project?.departments?.name}
       </Button>
@@ -51,6 +55,20 @@ export default function HeaderProject() {
         value={project?.username}
         onChange={(username: string) => router.push(`/projects/${username}`)}
       />
+
+      <div className="ml-auto">
+        {/* search button */}
+        <DialogSearch>
+          <Button size="sm" variant="outline" className="w-[200px] justify-start">
+            <Search className="size-4" />
+            <span className="ml-2">Search</span>
+            <div className="ml-auto flex items-center gap-0.5">
+              <Command className="size-3" />
+              <span>K</span>
+            </div>
+          </Button>
+        </DialogSearch>
+      </div>
     </div>
   );
 }

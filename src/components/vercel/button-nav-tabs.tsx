@@ -1,8 +1,10 @@
-"use client";
+'use client';
 
-import LogoCrm from "@/assets/img/logo-crm";
-import { cn } from "@/lib/utils";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from 'react';
+
+import { cn } from '@/lib/utils';
+
+import LogoCrm from '@/assets/img/logo-crm';
 
 const AnimatedNavTabs = ({
   tabs,
@@ -21,9 +23,7 @@ const AnimatedNavTabs = ({
   const hoverBgRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const activeTabRef = tabRefs.current.find(
-      (ref) => ref?.dataset.id === activeTabId
-    );
+    const activeTabRef = tabRefs.current.find((ref) => ref?.dataset.id === activeTabId);
     if (activeTabRef && tabIndicatorRef.current) {
       tabIndicatorRef.current.style.width = `${activeTabRef.offsetWidth}px`;
       tabIndicatorRef.current.style.left = `${activeTabRef.offsetLeft}px`;
@@ -36,27 +36,27 @@ const AnimatedNavTabs = ({
       if (hoverBgRef.current) {
         hoverBgRef.current.style.width = `${target.offsetWidth}px`;
         hoverBgRef.current.style.left = `${target.offsetLeft}px`;
-        hoverBgRef.current.style.opacity = "1";
+        hoverBgRef.current.style.opacity = '1';
       }
     };
 
     const handleMouseLeave = () => {
       if (hoverBgRef.current) {
-        hoverBgRef.current.style.opacity = "0";
-        hoverBgRef.current.style.width = "0px"; // Reset width on leave
+        hoverBgRef.current.style.opacity = '0';
+        hoverBgRef.current.style.width = '0px'; // Reset width on leave
       }
     };
 
     const tabsElements = tabRefs.current;
     tabsElements.forEach((tab) => {
-      tab?.addEventListener("mouseenter", handleMouseEnter);
-      tab?.addEventListener("mouseleave", handleMouseLeave); // Added mouseleave here for individual tab
+      tab?.addEventListener('mouseenter', handleMouseEnter);
+      tab?.addEventListener('mouseleave', handleMouseLeave); // Added mouseleave here for individual tab
     });
 
     return () => {
       tabsElements.forEach((tab) => {
-        tab?.removeEventListener("mouseenter", handleMouseEnter);
-        tab?.removeEventListener("mouseleave", handleMouseLeave); // Clean up event listeners
+        tab?.removeEventListener('mouseenter', handleMouseEnter);
+        tab?.removeEventListener('mouseleave', handleMouseLeave); // Clean up event listeners
       });
     };
   }, []);
@@ -83,8 +83,8 @@ const AnimatedNavTabs = ({
               data-id={tab.id}
               onClick={() => onTabClick(tab.id)}
               className={cn(
-                "relative cursor-pointer z-10 inline-flex h-11 items-center justify-center whitespace-nowrap rounded-none bg-transparent px-4  text-xs text-muted-foreground shadow-none ring-offset-background transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground data-[state=active]:shadow-none",
-                tab.id === activeTabId && "text-foreground"
+                'relative z-10 inline-flex h-11 cursor-pointer items-center justify-center whitespace-nowrap rounded-none bg-transparent px-4 text-xs text-muted-foreground shadow-none ring-offset-background transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground data-[state=active]:shadow-none',
+                tab.id === activeTabId && 'text-foreground',
               )}
             >
               {tab.label}
@@ -92,22 +92,16 @@ const AnimatedNavTabs = ({
           ))}
           <div
             ref={hoverBgRef}
-            className={`absolute cursor-pointer bottom-0 z-0 h-full py-2 transition-all ${
-              springy
-                ? "duration-200 ease-spring-4"
-                : "duration-150 ease-linear"
+            className={`absolute bottom-0 z-0 h-full cursor-pointer py-2 transition-all ${
+              springy ? 'ease-spring-4 duration-200' : 'duration-150 ease-linear'
             }`}
             style={{ opacity: 0 }}
           >
-            <div className="h-full w-full rounded-sm bg-muted bg-opacity-10 " />
+            <div className="h-full w-full rounded-sm bg-muted bg-opacity-10" />
           </div>
           <div
             ref={tabIndicatorRef}
-            className={`absolute bottom-0 z-10 transition-all ${
-              springy
-                ? "duration-200 ease-spring-4"
-                : "duration-150 ease-linear"
-            }`}
+            className={`absolute bottom-0 z-10 transition-all ${springy ? 'ease-spring-4 duration-200' : 'duration-150 ease-linear'}`}
           >
             <div className="h-[1px] bg-primary" />
           </div>
@@ -128,12 +122,5 @@ export const ButtonNavTabs = ({
   toggle: (id: string) => void;
   springy?: boolean;
 }) => {
-  return (
-    <AnimatedNavTabs
-      tabs={tabs}
-      activeTabId={activeTabId}
-      onTabClick={toggle}
-      springy={springy}
-    />
-  );
+  return <AnimatedNavTabs tabs={tabs} activeTabId={activeTabId} onTabClick={toggle} springy={springy} />;
 };

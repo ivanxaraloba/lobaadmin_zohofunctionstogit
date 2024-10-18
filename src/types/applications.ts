@@ -24,4 +24,5 @@ export interface CRMFunctions {
   updatedTime: string;
   display_name: string;
   associated_place: string | null;
+  createdTime: string;
 }
