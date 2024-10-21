@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Toaster } from 'sonner';
@@ -25,6 +26,7 @@ export default function RootLayout({
       <ThemeProvider>
         <html lang="en" className="dark">
           <body className={cn(inter.className, 'pb-if-overflow')}>
+            <Analytics />
             <Toaster richColors />
             <main>{children}</main>
           </body>
