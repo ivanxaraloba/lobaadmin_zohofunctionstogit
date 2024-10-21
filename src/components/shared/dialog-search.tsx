@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 
 import { Project } from '@/types/types';
 import { useHotkeys } from '@mantine/hooks';
-import { Label } from '@radix-ui/react-label';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -18,10 +17,8 @@ import {
   CommandItem,
   CommandList,
 } from '../ui/command';
-import { MultiSelect } from '../ui/multi-select';
 import BadgeApplication from './badge-application';
 import DialogCreateProject from './dialog-create-project';
-import PopoverFilters from './popover-filters';
 
 export default function DialogSearch({ children }: any) {
   const [open, setOpen] = useState(false);
