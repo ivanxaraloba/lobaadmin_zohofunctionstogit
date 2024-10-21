@@ -7,7 +7,10 @@ import { usePathname, useRouter } from 'next/navigation';
 
 import Sidebar from '@/components/layout/sidebar';
 import FormSetupBitbucket from '@/components/shared/form-setup-bitbucket';
+import Description from '@/components/ui/description';
 import { useGlobalStore } from '@/stores/global';
+
+import PageLogin from '../login/page';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -30,7 +33,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (!user) {
-    return null;
+    return <PageLogin />;
   }
 
   if (!user?.profile) {

@@ -26,7 +26,7 @@ const formSchema = z.object({
   bbPassword: z.string().min(6, 'Bitbucket Password is required'),
 });
 
-export default function Page() {
+export default function PageLogin() {
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
