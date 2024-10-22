@@ -11,7 +11,10 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ data }, { status: 200 });
-  } catch (err) {
-    return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
+  } catch (err: any) {
+    return NextResponse.json(
+      { error: err?.message || 'Failed to process request' },
+      { status: 500 },
+    );
   }
 }

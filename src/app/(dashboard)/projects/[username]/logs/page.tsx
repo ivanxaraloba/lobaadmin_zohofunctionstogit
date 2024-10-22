@@ -13,6 +13,7 @@ import { JsonViewer } from '@textea/json-viewer';
 import { format } from 'date-fns';
 import { Eye, Logs } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 import LoadingScreen from '@/components/shared/loading-screen';
 import { TypographyH1 } from '@/components/typography/typography-h1';
@@ -170,15 +171,22 @@ export default function Page({ params }: { params: { username: string } }) {
               onClick={async () => {
                 navigator.clipboard.writeText(`
 logMap = map();
-logMap.put("projectId", null);
-logMap.put("status", "");
+logMap.put("projectId", ${project?.id}); // * mandatory
 logMap.put("type", "");
 logMap.put("function", "");
 logMap.put("notes", "");
+responseLog = invokeurl
+[
+	url: "https://lobaadmin-zohofunctionstogit.vercel.app/api/logs"
+	type: POST
+	parameters: logMap.toString()
+];
 `);
+
+                toast.success('Text Copied');
               }}
             >
-              Click
+              Copy Text
             </Button>
           </div>
         </div>
