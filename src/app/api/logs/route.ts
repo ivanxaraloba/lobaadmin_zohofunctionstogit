@@ -1,8 +1,17 @@
-import { supabase } from '@/lib/supabase/server';
-import { NextRequest } from 'next/server';
+import { supabase } from '@/lib/supabase/client';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const response = await supabase.from('logs').insert(body);
-  return response;
+  try {
+    const body = await req.json();
+    const { data, error } = await supabase.from('logs').insert(body);
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ data }, { status: 200 });
+  } catch (err) {
+    return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
+  }
 }
