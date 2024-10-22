@@ -14,8 +14,22 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { useGlobalStore } from '@/stores/global';
 import { useProjectStore } from '@/stores/project';
 import { BUCKETS } from '@/utils/constants';
@@ -55,11 +69,20 @@ export default function DialogSettingsCRM() {
         'user-agent': obj.findToken(json, 'user-agent'),
       };
 
+      // @ts-ignore
+      const missing = Object.keys(config).filter((key) => !config[key])[0];
+      if (missing)
+        throw new Error(`${missing} missing in the file`, {
+          cause: 'Clear cache or try getting the file from another page',
+        });
+
       // test api
       const testApi = await crmGetOrgDetails(project?.domain, config);
       if (!testApi) throw new Error('Fail testing api');
 
-      const { error } = await supabase.from('crm').upsert({ id: project?.crm?.id, projectId: project?.id, config });
+      const { error } = await supabase
+        .from('crm')
+        .upsert({ id: project?.crm?.id, projectId: project?.id, config });
       if (error) throw error;
     },
     onSuccess: async () => {
@@ -96,7 +119,10 @@ export default function DialogSettingsCRM() {
             <VideoPlayerSettings src={`${BUCKETS.SETTINGS}/settings_crm.mp4`} />
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center justify-center gap-4">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col items-center justify-center gap-4"
+            >
               <FormField
                 control={form.control}
                 name="file"
@@ -119,7 +145,11 @@ export default function DialogSettingsCRM() {
                   </FormItem>
                 )}
               />
-              <ButtonLoading className="w-full" type="submit" loading={mutationCreateProject.isPending}>
+              <ButtonLoading
+                className="w-full"
+                type="submit"
+                loading={mutationCreateProject.isPending}
+              >
                 Save Changes
               </ButtonLoading>
             </form>

@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, Logs } from 'lucide-react';
 import { useParams } from 'next/navigation';
 
 import HeaderProject from '@/components/layout/header-project';
@@ -52,6 +52,10 @@ export default function RootLayout({
       to: `/projects/${username}/recruit`,
       disabled: !project?.recruit,
       className: cn(!project?.recruit && 'opacity-40'),
+    },
+    {
+      icon: Logs,
+      to: `/projects/${username}/logs`,
     },
   ];
   // .sort((a, b) => (a.disabled ? 1 : 0) - (b.disabled ? 1 : 0));

@@ -35,7 +35,12 @@ import { TypographyH2 } from '@/components/typography/typography-h2';
 import { Button } from '@/components/ui/button';
 import ButtonLoading from '@/components/ui/button-loading';
 import Description from '@/components/ui/description';
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import SearchInput from '@/components/ui/search-input';
 import { ButtonNavTabs } from '@/components/vercel/button-nav-tabs';
@@ -69,11 +74,19 @@ export default function Page({ params }: { params: { username: string } }) {
           <>
             {project?.recruit ? (
               <div className="flex flex-col">
-                <ButtonNavTabs tabs={TABS} activeTabId={activeTab} toggle={setActiveTab} springy />
+                <ButtonNavTabs
+                  tabs={TABS}
+                  activeTabId={activeTab}
+                  toggle={setActiveTab}
+                  springy
+                />
                 {activeTab === 'functions' && <TabFunctions username={username} />}
               </div>
             ) : (
-              <SectionMissing icon={TriangleAlert} message="Set up settings to continue" />
+              <SectionMissing
+                icon={TriangleAlert}
+                message="Set up settings to continue"
+              />
             )}
           </>
         )}

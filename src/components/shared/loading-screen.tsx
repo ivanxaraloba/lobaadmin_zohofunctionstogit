@@ -18,8 +18,13 @@ export default function LoadingScreen() {
               <div className="size-2 bg-muted-foreground rounded-full animate-bounce"></div>
             </div> */}
             <div className="relative grid place-items-center">
-              <TypographyH3 className="absolute animate-pulse text-muted-foreground">Z2G</TypographyH3>
-              <LoaderCircle strokeWidth={0.5} className="size-24 animate-spin text-muted-foreground" />
+              <TypographyH3 className="absolute animate-pulse text-muted-foreground">
+                Z2G
+              </TypographyH3>
+              <LoaderCircle
+                strokeWidth={0.5}
+                className="size-24 animate-spin text-muted-foreground"
+              />
             </div>
           </div>
         </div>

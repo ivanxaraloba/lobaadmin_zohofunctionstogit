@@ -12,8 +12,22 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { useGlobalStore } from '@/stores/global';
 import { useProjectStore } from '@/stores/project';
 import { BUCKETS } from '@/utils/constants';
@@ -51,6 +65,13 @@ export default function DialogSettingsCreator() {
         cookie: obj.findToken(json, 'Cookie', 'ZCBUILDERFIVE=true;'),
         'user-agent': obj.findToken(json, 'user-agent'),
       };
+
+      // @ts-ignore
+      const missing = Object.keys(config).filter((key) => !config[key])[0];
+      if (missing)
+        throw new Error(`${missing} missing in the file`, {
+          cause: 'Clear cache or try getting the file from another page',
+        });
 
       const { error } = await supabase.from('creator').upsert({
         id: project?.creator?.id,
@@ -95,7 +116,10 @@ export default function DialogSettingsCreator() {
             <VideoPlayerSettings src={`${BUCKETS.SETTINGS}/settings_creator.mp4`} />
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center justify-center gap-4">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col items-center justify-center gap-4"
+            >
               <FormField
                 control={form.control}
                 name="owner"
@@ -127,11 +151,17 @@ export default function DialogSettingsCreator() {
                       />
                     </FormControl>
                     <FormMessage />
-                    <FormDescription>Retrieve the file from the Form Workflows list page</FormDescription>
+                    <FormDescription>
+                      Retrieve the file from the Form Workflows list page
+                    </FormDescription>
                   </FormItem>
                 )}
               />
-              <ButtonLoading className="mt-4 w-full" type="submit" loading={mutationUpdateSettings.isPending}>
+              <ButtonLoading
+                className="mt-4 w-full"
+                type="submit"
+                loading={mutationUpdateSettings.isPending}
+              >
                 Save Changes
               </ButtonLoading>
             </form>
