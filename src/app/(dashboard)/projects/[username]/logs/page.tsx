@@ -170,17 +170,12 @@ export default function Page({ params }: { params: { username: string } }) {
             <Button
               onClick={async () => {
                 navigator.clipboard.writeText(`
-logMap = map();
-logMap.put("projectId", ${project?.id}); // * mandatory
-logMap.put("type", "");
-logMap.put("function", "");
-logMap.put("notes", "");
-responseLog = invokeurl
-[
-	url: "https://lobaadmin-zohofunctionstogit.vercel.app/api/logs"
-	type: POST
-	parameters: logMap.toString()
-];
+logMap = Map();
+logMap.put("projectId",90);
+logMap.put("type","");
+logMap.put("function","dsadasdsa");
+logMap.put("notes","");
+responseLog = postUrl("https://lobaadmin-zohofunctionstogit.vercel.app/api/logs", logMap.toString());
 `);
 
                 toast.success('Text Copied');
