@@ -3,21 +3,32 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { supabase } from '@/lib/supabase/client';
+import { cn } from '@/lib/utils';
+import { MixerHorizontalIcon } from '@radix-ui/react-icons';
+import { useQuery } from '@tanstack/react-query';
 import {
   ColumnDef,
+  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  SortingState,
   useReactTable,
+  VisibilityState,
 } from '@tanstack/react-table';
 import { JsonViewer } from '@textea/json-viewer';
 import { format } from 'date-fns';
-import { Eye, Logs } from 'lucide-react';
+import { ArrowUpDown, Eye, Logs } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
+import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import LoadingScreen from '@/components/shared/loading-screen';
 import { TypographyH1 } from '@/components/typography/typography-h1';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -27,6 +38,15 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import {
   Table,
   TableBody,
   TableCell,
@@ -35,14 +55,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useProjectStore } from '@/stores/project';
+import { LOGS_TYPES_COLORS } from '@/utils/constants';
 import { time } from '@/utils/generic';
-
-const STATUS_COLORS = {
-  success: 'bg-green-400',
-  error: 'bg-red-400',
-  warning: 'bg-yellow-400',
-  info: 'bg-gray-400',
-};
 
 const isJson = (notes: string) => {
   try {
@@ -53,26 +67,70 @@ const isJson = (notes: string) => {
   }
 };
 
-const columns: ColumnDef<any>[] = [
+type ColumnDefExtended<TData = any> = ColumnDef<TData> & {
+  title?: string;
+};
+
+const columns: ColumnDefExtended<any>[] = [
+  {
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: 'type',
-    header: 'Type',
+    title: 'Type',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
     cell: ({ row }) => (
-      <div
-        //@ts-ignore
-        className={`size-2 rounded-full ${STATUS_COLORS[row.original.type || 'info']}`}
-      />
+      <Badge
+        className={cn(
+          //@ts-ignore
+          LOGS_TYPES_COLORS[row.original.type],
+          'pointer-events-none rounded-full text-white',
+        )}
+      >
+        {row.original.type}
+      </Badge>
     ),
   },
   {
     accessorKey: 'function',
-    header: 'Function',
+    title: 'Function',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Function" />,
   },
   {
     accessorKey: 'notes',
-    header: 'Notes',
+    title: 'Notes',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Notes" />,
     cell: ({ row }) => (
-      <div className="max-h-14 overflow-hidden text-wrap">{row.original.notes}</div>
+      <div className="max-h-14 overflow-hidden text-wrap">{row.getValue('notes')}</div>
+    ),
+  },
+  {
+    accessorKey: 'created_at',
+    title: 'Created At',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
+    cell: ({ row }) => (
+      <span className="whitespace-nowrap">
+        {format(row.getValue('created_at'), 'dd-MM-yyyy HH:mm:ss')}
+      </span>
     ),
   },
   {
@@ -119,27 +177,43 @@ const columns: ColumnDef<any>[] = [
 export default function Page({ params }: { params: { username: string } }) {
   const { project } = useProjectStore();
   const [data, setData] = useState<any[]>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    onRowSelectionChange: setRowSelection,
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    state: {
+      sorting,
+      rowSelection,
+      columnFilters,
+      columnVisibility,
+    },
   });
 
-  useEffect(() => {
-    if (!project?.id) return;
-
-    const fetchData = async () => {
+  const queryLogs = useQuery<any>({
+    queryKey: ['logs', project?.id],
+    queryFn: async () => {
       const { data } = await supabase
         .from('logs')
         .select('*')
-        .eq('projectId', project.id)
+        .eq('projectId', project?.id)
         .order('created_at', { ascending: false });
       setData(data || []);
-    };
+      return data;
+    },
+  });
 
-    fetchData();
-
+  useEffect(() => {
     const changes = supabase
       .channel('table-logs-changes')
       .on(
@@ -148,9 +222,9 @@ export default function Page({ params }: { params: { username: string } }) {
           event: 'INSERT',
           schema: 'public',
           table: 'logs',
-          filter: `projectId=eq.${project.id}`,
+          filter: `projectId=eq.${project?.id}`,
         },
-        (payload) => setData((prevData) => [payload.new, ...prevData]),
+        (payload) => setData((prev) => [payload.new, ...prev]),
       )
       .subscribe();
 
@@ -172,7 +246,7 @@ export default function Page({ params }: { params: { username: string } }) {
                 navigator.clipboard.writeText(`
 logMap = Map();
 logMap.put("projectId",90);
-logMap.put("type","");
+logMap.put("type",""); // valid types: [success, error, warning, info]
 logMap.put("function","dsadasdsa");
 logMap.put("notes","");
 responseLog = postUrl("https://lobaadmin-zohofunctionstogit.vercel.app/api/logs", logMap.toString());
@@ -185,39 +259,87 @@ responseLog = postUrl("https://lobaadmin-zohofunctionstogit.vercel.app/api/logs"
             </Button>
           </div>
         </div>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
+        {/* table */}
+        <div className="">
+          <div className="flex items-center py-4">
+            <Input
+              className="max-w-sm"
+              placeholder="Filter by function name..."
+              value={(table.getColumn('function')?.getFilterValue() as string) ?? ''}
+              onChange={(event) =>
+                table.getColumn('function')?.setFilterValue(event.target.value)
+              }
+            />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  aria-label="Toggle columns"
+                  variant="outline"
+                  size="sm"
+                  className="ml-auto hidden h-8 lg:flex"
+                >
+                  <MixerHorizontalIcon className="mr-2 size-4" />
+                  View
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {table
+                  .getAllColumns()
+                  .filter(
+                    (column) =>
+                      typeof column.accessorFn !== 'undefined' && column.getCanHide(),
+                  )
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                      >
+                        <span className="truncate">{column.id}</span>
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
                     ))}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </div>
     </>

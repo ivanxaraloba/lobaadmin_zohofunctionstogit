@@ -63,10 +63,12 @@ export default function DialogSettingsCRM() {
       const json = JSON.parse(content);
 
       let config = {
-        cookie: obj.findToken(json, 'cookie'),
-        'x-crm-org': obj.findToken(json, 'x-crm-org'),
-        'x-zcsrf-token': obj.findToken(json, 'x-zcsrf-token'),
-        'user-agent': obj.findToken(json, 'user-agent'),
+        cookie: obj.findToken(json, 'cookie') || obj.findToken(json, 'Cookie'),
+        'x-crm-org': obj.findToken(json, 'x-crm-org') || obj.findToken(json, 'X-CRM-ORG'),
+        'x-zcsrf-token':
+          obj.findToken(json, 'x-zcsrf-token') || obj.findToken(json, 'X-ZCSRF-TOKEN'),
+        'user-agent':
+          obj.findToken(json, 'user-agent') || obj.findToken(json, 'User-Agent'),
       };
 
       // @ts-ignore

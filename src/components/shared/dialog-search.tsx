@@ -39,7 +39,7 @@ export default function DialogSearch({ children }: any) {
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Type a command or search..." />
-        <CommandList>
+        <CommandList className="h-[400px]">
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup heading="Actions">
             <CommandItem

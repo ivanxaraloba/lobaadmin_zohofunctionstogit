@@ -1,9 +1,19 @@
 import { supabase } from '@/lib/supabase/client';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { LOGS_TYPES_COLORS } from '@/utils/constants';
+
+// id
+// projectId
+// function
+// notes
+// type
+// created_at
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
     const { data, error } = await supabase.from('logs').insert(body);
 
     if (error) {

@@ -35,6 +35,10 @@ export default function RootLayout({
       icon: LayoutDashboard,
       to: `/projects/${username}`,
     },
+    // {
+    //   icon: Logs,
+    //   to: `/projects/${username}/logs`,
+    // },
     {
       icon: LogoCrm,
       to: `/projects/${username}/crm`,
@@ -53,10 +57,6 @@ export default function RootLayout({
       disabled: !project?.recruit,
       className: cn(!project?.recruit && 'opacity-40'),
     },
-    // {
-    //   icon: Logs,
-    //   to: `/projects/${username}/logs`,
-    // },
   ];
   // .sort((a, b) => (a.disabled ? 1 : 0) - (b.disabled ? 1 : 0));
 

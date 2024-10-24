@@ -9,27 +9,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { signOut } from '@/utils/authentication';
 import LogoLoba from '@/assets/img/logo-loba';
 
-const Button = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-  <button {...props} />
-);
-
-export function SidebarItem({ children, to = '', className, onClick }: any) {
-  const Comp = onClick ? Button : Link;
-
-  return (
-    <Comp
-      href={to}
-      className={cn(
-        'flex aspect-square h-12 items-center justify-start gap-2 rounded-md px-4 text-sm hover:bg-secondary',
-        className,
-      )}
-      // @ts-ignore
-      onClick={onClick}
-    >
-      {children}
-    </Comp>
-  );
-}
+import { Button } from '../ui/button';
 
 interface Route {
   name?: string;
@@ -45,7 +25,6 @@ export default function Sidebar({
   routes: Route[];
   onlyIcons?: boolean;
 }) {
-  const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
 
@@ -53,33 +32,48 @@ export default function Sidebar({
     <div className="fixed h-screen border-r">
       <div className={cn('h-full px-2 py-8', onlyIcons ? 'w-[68px]' : 'w-52')}>
         <div className="flex h-full w-full flex-col">
-          <SidebarItem className="hover:bg-transparent" to="/projects">
-            <LogoLoba />
-          </SidebarItem>
+          {/* Logo section */}
+          <Link href="/projects">
+            <Button variant="ghost" className="h-12 w-full items-center justify-start">
+              <LogoLoba />
+            </Button>
+          </Link>
+
+          {/* Routes */}
           <div className="mt-5 flex flex-col gap-1">
             {routes.map((item: any, index: number) => (
-              <SidebarItem
-                key={item.to}
-                className={cn(pathname === item.to && 'bg-secondary', item.className)}
-                to={item.to}
-              >
-                <item.icon
-                  className={cn('size-5', item.classNameIcon)}
-                  strokeWidth={1.5}
-                />
-                {!onlyIcons && <span className="font-medium">{item.name}</span>}
-              </SidebarItem>
+              <Link key={item.to} href={item.to}>
+                <Button
+                  variant={pathname === item.to ? 'secondary' : 'ghost'}
+                  className={cn('h-12 w-full items-center justify-start', item.className)}
+                >
+                  <item.icon
+                    className={cn('size-5', item.classNameIcon)}
+                    strokeWidth={1.5}
+                  />
+                  {!onlyIcons && <span className="font-medium">{item.name}</span>}
+                </Button>
+              </Link>
             ))}
           </div>
+
           <div className="mt-auto flex flex-col">
-            <SidebarItem onClick={toggleTheme}>
+            <Button
+              onClick={toggleTheme}
+              variant="ghost"
+              className="h-12 w-full items-center justify-start"
+            >
               <SunMoon className="size-5" strokeWidth={1.5} />
               {!onlyIcons && <span className="font-medium">Theme</span>}
-            </SidebarItem>
-            <SidebarItem onClick={() => signOut()}>
+            </Button>
+            <Button
+              onClick={() => signOut()}
+              variant="ghost"
+              className="h-12 w-full items-center justify-start"
+            >
               <LogOut className="size-5" strokeWidth={1.5} />
               {!onlyIcons && <span className="font-medium">Logout</span>}
-            </SidebarItem>
+            </Button>
           </div>
         </div>
       </div>

@@ -35,3 +35,10 @@ export const DEPARMENTS = {
   FTE: 1,
   INTERNOS: 2,
 };
+
+export const LOGS_TYPES_COLORS = {
+  success: 'bg-green-600',
+  error: 'bg-red-600',
+  warning: 'bg-yellow-600',
+  info: 'bg-zinc-600',
+};
