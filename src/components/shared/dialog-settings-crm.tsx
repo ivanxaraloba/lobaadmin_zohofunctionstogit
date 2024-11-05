@@ -33,20 +33,19 @@ import {
 import { useGlobalStore } from '@/stores/global';
 import { useProjectStore } from '@/stores/project';
 import { BUCKETS } from '@/utils/constants';
-import { files, obj } from '@/utils/generic';
+import { files, obj, type, str } from '@/utils/generic';
 
 import { Button } from '../ui/button';
 import ButtonLoading from '../ui/button-loading';
 import Description from '../ui/description';
-import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
 import VideoPlayerSettings from './video-player-settings';
 
 const formSchema = z.object({
-  file: z.instanceof(File),
+  har: z.string().min(3),
 });
 
-
-export default function DialogSettingsCRM() {
+export default function DialogSettingsCRM2() {
   const { project, getProject } = useProjectStore();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -54,22 +53,19 @@ export default function DialogSettingsCRM() {
     mode: 'onChange',
     resolver: zodResolver(formSchema),
     defaultValues: {
-      file: undefined,
+      har: '',
     },
   });
 
   const mutationCreateProject = useMutation({
-    mutationFn: async ({ file }: { file: any }) => {
-      const content = await files.read(file);
-      const json = JSON.parse(content);
+    mutationFn: async ({ har }: { har: string }) => {
+      har = str.parseCURL(har);
 
-      let config = {
-        cookie:
-          obj.findToken(json, 'cookie', { filterString: 'zVisitCount' }) ||
-          obj.findToken(json, 'Cookie', { caseSensitive: true }),
-        'x-crm-org': obj.findToken(json, 'x-crm-org'),
-        'x-zcsrf-token': obj.findToken(json, 'x-zcsrf-token'),
-        'user-agent': obj.findToken(json, 'user-agent'),
+      const config = {
+        cookie: har.cookie,
+        'x-crm-org': har['x-crm-org'],
+        'x-zcsrf-token': har['x-zcsrf-token'],
+        'user-agent': har['user-agent'],
       };
 
       // test api
@@ -91,7 +87,7 @@ export default function DialogSettingsCRM() {
       setIsOpen(false);
     },
     onError: (err) => {
-      toast.error(err.message || 'Something wrong went');
+      toast.error(err.message || 'Something went wrong');
     },
   });
 
@@ -100,8 +96,11 @@ export default function DialogSettingsCRM() {
   };
 
   useEffect(() => {
+    // @ts-ignore
     form.reset({ ...project });
   }, [project?.id]);
+
+
 
   return (
     <>
@@ -123,23 +122,20 @@ export default function DialogSettingsCRM() {
             >
               <FormField
                 control={form.control}
-                name="file"
+                name="har"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>File .Har</FormLabel>
+                    <FormLabel>cURL</FormLabel>
                     <FormControl>
-                      <Input
-                        type="file"
-                        accept=".har"
-                        onChange={(e) => {
-                          if (e.target.files?.[0]) {
-                            field.onChange(e.target.files[0]);
-                          }
-                        }}
+                      <Textarea
+                        {...field}
+                        className="textarea"
+                        rows={10}
+                        placeholder="Paste your cURL here..."
                       />
                     </FormControl>
                     <FormMessage />
-                    <FormDescription>Retrieve the file from the homepage</FormDescription>
+                    <FormDescription>Paste here cURL text</FormDescription>
                   </FormItem>
                 )}
               />

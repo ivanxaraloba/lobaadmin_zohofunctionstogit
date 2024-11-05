@@ -160,6 +160,34 @@ export const str = {
       .textContent;
     return decodedString;
   },
+  parseCURL: (curlStr) => {
+    const lines = curlStr.split('\\\n').map((line) => line.trim());
+    const jsonResult = {};
+
+    // Parse URL and query parameters
+    const urlMatch = lines[0].match(/curl '([^']+)'/);
+    if (urlMatch) {
+      const url = new URL(urlMatch[1]);
+      jsonResult.url = url.origin + url.pathname;
+
+      // Add query parameters directly to the JSON object
+      url.searchParams.forEach((value, key) => {
+        jsonResult[key] = value;
+      });
+    }
+
+    // Parse headers
+    lines.slice(1).forEach((line) => {
+      const headerMatch = line.match(/-H '([^:]+): (.+)'/);
+      if (headerMatch) {
+        const headerKey = headerMatch[1].trim();
+        const headerValue = headerMatch[2].trim();
+        jsonResult[headerKey] = headerValue;
+      }
+    });
+
+    return jsonResult;
+  },
 };
 
 export const time = {
