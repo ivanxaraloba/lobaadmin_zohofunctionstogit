@@ -24,11 +24,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import CodeViewer from '@/components/shared/code-viewer';
-import ScriptViewer from '@/components/shared/code-viewer';
+import { ButtonNavTabs } from '@/components/layout/nav-tabs';
 import DialogSettingsCRM from '@/components/shared/dialog-settings-crm';
 import DialogSettingsRecruit from '@/components/shared/dialog-settings-recruit';
 import LoadingScreen from '@/components/shared/loading-screen';
+import CodeViewer from '@/components/shared/script-viewer';
+import ScriptViewer from '@/components/shared/script-viewer';
 import SectionMissing from '@/components/shared/section-missing';
 import { TypographyH1 } from '@/components/typography/typography-h1';
 import { TypographyH2 } from '@/components/typography/typography-h2';
@@ -42,12 +43,9 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import SearchInput from '@/components/ui/search-input';
-import { ButtonNavTabs } from '@/components/vercel/button-nav-tabs';
-import { LinkNavTabs } from '@/components/vercel/link-nav-tabs';
 import { useGlobalStore } from '@/stores/global';
 import { useProjectStore } from '@/stores/project';
-import { useSearch } from '@/hooks/useSearch';
+import { useSearch } from '@/hooks/use-search';
 import { arr, str, time } from '@/utils/generic';
 import LogoCrm from '@/assets/img/logo-crm';
 import LogoRecruit from '@/assets/img/logo-recruit';

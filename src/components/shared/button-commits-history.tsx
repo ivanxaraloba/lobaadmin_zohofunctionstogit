@@ -35,11 +35,7 @@ export default function ButtonCommitsHistory({ commits = [] }: { commits: Commit
               ))}
             </div>
           ) : (
-            <SectionMissing
-              className="h-fit"
-              icon={Meh}
-              message="No commits have been made yet"
-            />
+            <SectionMissing icon={Meh} message="No commits have been made yet" />
           )}
         </div>
       </DialogContent>

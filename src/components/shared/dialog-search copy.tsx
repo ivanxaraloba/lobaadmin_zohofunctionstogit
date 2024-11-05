@@ -9,10 +9,14 @@ import { useHotkeys } from '@mantine/hooks';
 import { ChevronsUpDown, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useGlobalStore } from '@/stores/global';
-import { useFilters } from '@/hooks/useFilters';
+import { useFilters } from '@/hooks/use-filters';
 
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -87,13 +91,21 @@ export default function DialogSearch() {
                     </div>
                     <div className="flex h-fit items-center gap-x-1.5">
                       {!!project.crm && (
-                        <BadgeApplication className={cn(!functions?.length && 'opacity-50')} application="crm" />
+                        <BadgeApplication
+                          className={cn(!functions?.length && 'opacity-50')}
+                          application="crm"
+                        />
                       )}
                       {!!project.creator?.creatorApps?.length && (
                         <BadgeApplication application="creator" className="opacity-50" />
                       )}
-                      {!!project.recruit && <BadgeApplication application="recruit" className="opacity-50" />}
-                      <CollapsibleTrigger onClick={(e) => e.stopPropagation()} className="[data-state=open]:hidden">
+                      {!!project.recruit && (
+                        <BadgeApplication application="recruit" className="opacity-50" />
+                      )}
+                      <CollapsibleTrigger
+                        onClick={(e) => e.stopPropagation()}
+                        className="[data-state=open]:hidden"
+                      >
                         <ChevronsUpDown className="size-4" />
                       </CollapsibleTrigger>
                     </div>
@@ -107,7 +119,9 @@ export default function DialogSearch() {
                         variant="outline"
                         className="w-full border text-xs"
                         onClick={() =>
-                          redirect(`/projects/${project.username}/crm?function=${functionInfo.name}&search=${search}`)
+                          redirect(
+                            `/projects/${project.username}/crm?function=${functionInfo.name}&search=${search}`,
+                          )
                         }
                       >
                         {functionInfo.display_name}

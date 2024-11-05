@@ -16,14 +16,23 @@ import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useGlobalStore } from '@/stores/global';
-import { useFilters } from '@/hooks/useFilters';
+import { useFilters } from '@/hooks/use-filters';
 import { APPLICATIONS } from '@/utils/constants';
 import { matchByWords } from '@/utils/filters';
 
 export default function Page() {
   const { projects, departments } = useGlobalStore();
   const [open, setOpen] = useState(false);
-  const { data, search, setSearch, filters, setFilters, filtersCount, searchMatches, setSearchMatches } = useFilters({
+  const {
+    data,
+    search,
+    setSearch,
+    filters,
+    setFilters,
+    filtersCount,
+    searchMatches,
+    setSearchMatches,
+  } = useFilters({
     data: projects,
     filterConfig: [
       {
@@ -37,7 +46,8 @@ export default function Page() {
       {
         key: 'applications',
         type: 'array',
-        matchFn: (project: any, filterValue: string[]) => filterValue.some((app: string) => project[app]),
+        matchFn: (project: any, filterValue: string[]) =>
+          filterValue.some((app: string) => project[app]),
       },
     ],
     searchMatchFn: (data: any, searchValue: string) => {

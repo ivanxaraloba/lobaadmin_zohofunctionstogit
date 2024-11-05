@@ -62,7 +62,9 @@ export default function DialogSettingsCreator() {
       const json = JSON.parse(content);
 
       let config = {
-        cookie: obj.findToken(json, 'Cookie', 'ZCBUILDERFIVE=true;'),
+        cookie: obj.findToken(json, 'Cookie', {
+          filterString: 'ZCBUILDERFIVE=true;',
+        }),
         'user-agent': obj.findToken(json, 'user-agent'),
       };
 

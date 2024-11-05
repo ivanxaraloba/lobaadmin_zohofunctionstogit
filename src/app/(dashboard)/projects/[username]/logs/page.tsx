@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
+import { queryClient } from '@/providers/react-query';
 import { MixerHorizontalIcon } from '@radix-ui/react-icons';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -19,11 +20,12 @@ import {
 } from '@tanstack/react-table';
 import { JsonViewer } from '@textea/json-viewer';
 import { format } from 'date-fns';
-import { ArrowUpDown, Eye, Logs } from 'lucide-react';
+import { ArrowUpDown, Check, Eye, Logs } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
+import { DataTableFacetedFilter } from '@/components/data-table/data-table-faceted-filter';
 import LoadingScreen from '@/components/shared/loading-screen';
 import { TypographyH1 } from '@/components/typography/typography-h1';
 import { Badge } from '@/components/ui/badge';
@@ -55,17 +57,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useProjectStore } from '@/stores/project';
-import { LOGS_TYPES_COLORS } from '@/utils/constants';
-import { time } from '@/utils/generic';
-
-const isJson = (notes: string) => {
-  try {
-    JSON.parse(notes);
-    return true;
-  } catch {
-    return false;
-  }
-};
+import { LOGS_TYPES, LOGS_TYPES_COLORS } from '@/utils/constants';
+import { time, type } from '@/utils/generic';
 
 type ColumnDefExtended<TData = any> = ColumnDef<TData> & {
   title?: string;
@@ -100,15 +93,19 @@ const columns: ColumnDefExtended<any>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
     cell: ({ row }) => (
       <Badge
-        className={cn(
-          //@ts-ignore
-          LOGS_TYPES_COLORS[row.original.type],
-          'pointer-events-none rounded-full text-white',
-        )}
+        className="pointer-events-none rounded-full text-white shadow-none"
+        style={{
+          // @ts-ignore
+          backgroundColor: LOGS_TYPES_COLORS[row.original.type],
+        }}
       >
         {row.original.type}
       </Badge>
     ),
+    filterFn: (row, columnId, filterValues) => {
+      // Apply 'or' filtering logic
+      return filterValues.some((val: any) => row.getValue(columnId) === val);
+    },
   },
   {
     accessorKey: 'function',
@@ -120,7 +117,9 @@ const columns: ColumnDefExtended<any>[] = [
     title: 'Notes',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Notes" />,
     cell: ({ row }) => (
-      <div className="max-h-14 overflow-hidden text-wrap">{row.getValue('notes')}</div>
+      <div className="max-h-14 max-w-[500px] overflow-hidden break-words">
+        {row.getValue('notes')}
+      </div>
     ),
   },
   {
@@ -133,57 +132,84 @@ const columns: ColumnDefExtended<any>[] = [
       </span>
     ),
   },
+  // {
+  //   id: 'actions',
+  //   cell: ({ row }: any) => (
+  //     <div className="flex justify-end space-x-2">
+  //       <Button onClick={() => setViewRow(row)} variant="ghost" size="sm">
+  //         <Eye className="size-4" />
+  //       </Button>
+  //     </div>
+  //   ),
+  // },
   {
     id: 'actions',
-    cell: ({ row }) => (
-      <div className="flex justify-end space-x-2">
-        <Dialog>
-          <DialogTrigger>
-            <Button variant="ghost" size="sm">
-              <Eye className="size-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="min-w-96 sm:max-w-2xl">
-            <DialogHeader className="border-b pb-2">
-              <DialogTitle className="flex items-center gap-2">
-                <div className="size-2 rounded-full bg-yellow-400" />
-                <span>{row.original.function}</span>
-              </DialogTitle>
-              <DialogDescription>
-                {time.timeAgo(row.original.created_at)} -{' '}
-                {format(row.original.created_at, 'dd-MM-yyyy HH:mm:ss')}
-              </DialogDescription>
-            </DialogHeader>
-            <span className="h-96 max-h-96 overflow-auto whitespace-pre-wrap">
-              {isJson(row.original.notes) ? (
-                <JsonViewer
-                  value={JSON.parse(row.original.notes)}
-                  theme="dark"
-                  displayDataTypes={false}
-                  rootName={false}
-                  collapseStringsAfterLength={20}
-                />
-              ) : (
-                row.original.notes
-              )}
-            </span>
-          </DialogContent>
-        </Dialog>
-      </div>
+    cell: ({ row }: any) => (
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="ghost" size="sm">
+            <Eye className="size-4" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="min-w-96 sm:max-w-2xl">
+          <DialogHeader className="border-b pb-2">
+            <DialogTitle>
+              <div
+                className="mr-2 inline-flex size-2 rounded-full"
+                style={{
+                  backgroundColor: LOGS_TYPES_COLORS[row.original.type],
+                }}
+              />
+              <span>{row.original.function}</span>
+            </DialogTitle>
+            <DialogDescription>
+              {time.timeAgo(row.original.created_at)} -{' '}
+              {format(row.original.created_at, 'dd-MM-yyyy HH:mm:ss')}
+            </DialogDescription>
+          </DialogHeader>
+          <span className="h-96 max-h-96 overflow-auto whitespace-pre-wrap">
+            {type.isJson(row.original.notes) ? (
+              <JsonViewer
+                value={JSON.parse(row.original.notes)}
+                theme="dark"
+                displayDataTypes={false}
+                rootName={false}
+                collapseStringsAfterLength={20}
+              />
+            ) : (
+              row.original.notes
+            )}
+          </span>
+        </DialogContent>
+      </Dialog>
     ),
   },
 ];
 
 export default function Page({ params }: { params: { username: string } }) {
   const { project } = useProjectStore();
-  const [data, setData] = useState<any[]>([]);
+
+  const [viewRow, setViewRow] = useState<any>(null);
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 
+  const queryLogs = useQuery<any>({
+    queryKey: ['logs', project?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('logs')
+        .select('*')
+        .eq('projectUsername', project?.username)
+        .order('created_at', { ascending: false });
+      return data;
+    },
+  });
+
   const table = useReactTable({
-    data,
+    data: queryLogs.data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
@@ -200,19 +226,6 @@ export default function Page({ params }: { params: { username: string } }) {
     },
   });
 
-  const queryLogs = useQuery<any>({
-    queryKey: ['logs', project?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('logs')
-        .select('*')
-        .eq('projectId', project?.id)
-        .order('created_at', { ascending: false });
-      setData(data || []);
-      return data;
-    },
-  });
-
   useEffect(() => {
     const changes = supabase
       .channel('table-logs-changes')
@@ -222,9 +235,13 @@ export default function Page({ params }: { params: { username: string } }) {
           event: 'INSERT',
           schema: 'public',
           table: 'logs',
-          filter: `projectId=eq.${project?.id}`,
+          filter: `projectUsername=eq.${project?.username}`,
         },
-        (payload) => setData((prev) => [payload.new, ...prev]),
+        (payload) => {
+          queryClient.setQueryData(['logs', project?.id], (prev: any[]) => {
+            return [payload.new, ...prev];
+          });
+        },
       )
       .subscribe();
 
@@ -236,32 +253,111 @@ export default function Page({ params }: { params: { username: string } }) {
   return (
     <>
       {!project && <LoadingScreen />}
+
+      {viewRow && (
+        <Dialog open={viewRow} onOpenChange={setViewRow}>
+          <DialogContent className="min-w-96 sm:max-w-2xl">
+            <DialogHeader className="border-b pb-2">
+              <DialogTitle>
+                <div
+                  className="mr-2 inline-flex size-2 rounded-full"
+                  style={{
+                    // @ts-ignore
+                    backgroundColor: LOGS_TYPES_COLORS[viewRow.original.type],
+                  }}
+                />
+                <span>{viewRow.original.function}</span>
+              </DialogTitle>
+              <DialogDescription>
+                {time.timeAgo(viewRow.original.created_at)} -{' '}
+                {format(viewRow.original.created_at, 'dd-MM-yyyy HH:mm:ss')}
+              </DialogDescription>
+            </DialogHeader>
+            <span className="h-96 max-h-96 overflow-auto whitespace-pre-wrap">
+              {type.isJson(viewRow.original.notes) ? (
+                <JsonViewer
+                  value={JSON.parse(viewRow.original.notes)}
+                  theme="dark"
+                  displayDataTypes={false}
+                  rootName={false}
+                  collapseStringsAfterLength={20}
+                />
+              ) : (
+                viewRow.original.notes
+              )}
+            </span>
+          </DialogContent>
+        </Dialog>
+      )}
+
       <div className="flex flex-col">
         <div className="flex items-center gap-4 pb-10 text-xs">
           <Logs className="size-6" />
           <TypographyH1>Logs</TypographyH1>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
             <Button
               onClick={async () => {
                 navigator.clipboard.writeText(`
 logMap = Map();
-logMap.put("projectId",90);
+logMap.put("projectUsername", "${project?.username}");
 logMap.put("type",""); // valid types: [success, error, warning, info]
 logMap.put("function","dsadasdsa");
 logMap.put("notes","");
 responseLog = postUrl("https://lobaadmin-zohofunctionstogit.vercel.app/api/logs", logMap.toString());
 `);
 
-                toast.success('Text Copied');
+                toast.success('Deluge Code Copied');
               }}
             >
-              Copy Text
+              Deluge
+            </Button>
+            <Button
+              onClick={async () => {
+                navigator.clipboard.writeText(`
+const logMap = {
+  projectUsername: "${project?.username}",
+  type: "", // valid types: [success, error, warning, info]
+  function: "dsadasdsa",
+  notes: ""
+};
+
+const response = await axios.post("https://lobaadmin-zohofunctionstogit.vercel.app/api/logs", logMap);
+`);
+
+                toast.success('Axios Code Copied');
+              }}
+            >
+              Axios
+            </Button>
+            <Button
+              onClick={async () => {
+                navigator.clipboard.writeText(`
+const logMap = {
+  projectUsername: "${project?.username}",
+  type: "", // valid types: [success, error, warning, info]
+  function: "dsadasdsa",
+  notes: ""
+};
+
+const response = await fetch("https://lobaadmin-zohofunctionstogit.vercel.app/api/logs", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(logMap),
+});
+`);
+
+                toast.success('Fetch Code Copied');
+              }}
+            >
+              Fetch
             </Button>
           </div>
         </div>
         {/* table */}
         <div className="">
-          <div className="flex items-center py-4">
+          <div className="flex items-center gap-2 py-4">
             <Input
               className="max-w-sm"
               placeholder="Filter by function name..."
@@ -270,13 +366,22 @@ responseLog = postUrl("https://lobaadmin-zohofunctionstogit.vercel.app/api/logs"
                 table.getColumn('function')?.setFilterValue(event.target.value)
               }
             />
+
+            <DataTableFacetedFilter
+              key="type"
+              title="Types"
+              column={table.getColumn('type')}
+              options={LOGS_TYPES.map((type) => ({
+                label: type,
+                value: type,
+              }))}
+            />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   aria-label="Toggle columns"
                   variant="outline"
-                  size="sm"
-                  className="ml-auto hidden h-8 lg:flex"
+                  className="ml-auto hidden lg:flex"
                 >
                   <MixerHorizontalIcon className="mr-2 size-4" />
                   View
@@ -324,7 +429,7 @@ responseLog = postUrl("https://lobaadmin-zohofunctionstogit.vercel.app/api/logs"
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
+                        <TableCell className="py-2 text-xs" key={cell.id}>
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       ))}

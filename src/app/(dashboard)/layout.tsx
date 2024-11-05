@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 
-import { PanelsTopLeft } from 'lucide-react';
+import { Braces, PanelsTopLeft } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
 import Sidebar from '@/components/layout/sidebar';
@@ -21,6 +21,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       icon: PanelsTopLeft,
       to: '/projects',
     },
+    // {
+    //   name: 'Tokens',
+    //   icon: Braces,
+    //   to: '/tokens',
+    // },
   ];
 
   const { user, getUser } = useGlobalStore();

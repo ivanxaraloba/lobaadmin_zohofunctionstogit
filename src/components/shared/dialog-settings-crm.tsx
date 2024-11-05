@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { crmGetOrgDetails } from '@/helpers/zoho/crm';
+import { crmGetFunctions } from '@/helpers/zoho/crm';
 import { supabase } from '@/lib/supabase/client';
 import { Project } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -45,6 +45,7 @@ const formSchema = z.object({
   file: z.instanceof(File),
 });
 
+
 export default function DialogSettingsCRM() {
   const { project, getProject } = useProjectStore();
 
@@ -63,24 +64,20 @@ export default function DialogSettingsCRM() {
       const json = JSON.parse(content);
 
       let config = {
-        cookie: obj.findToken(json, 'cookie') || obj.findToken(json, 'Cookie'),
-        'x-crm-org': obj.findToken(json, 'x-crm-org') || obj.findToken(json, 'X-CRM-ORG'),
-        'x-zcsrf-token':
-          obj.findToken(json, 'x-zcsrf-token') || obj.findToken(json, 'X-ZCSRF-TOKEN'),
-        'user-agent':
-          obj.findToken(json, 'user-agent') || obj.findToken(json, 'User-Agent'),
+        cookie:
+          obj.findToken(json, 'cookie', { filterString: 'zVisitCount' }) ||
+          obj.findToken(json, 'Cookie', { caseSensitive: true }),
+        'x-crm-org': obj.findToken(json, 'x-crm-org'),
+        'x-zcsrf-token': obj.findToken(json, 'x-zcsrf-token'),
+        'user-agent': obj.findToken(json, 'user-agent'),
       };
 
-      // @ts-ignore
-      const missing = Object.keys(config).filter((key) => !config[key])[0];
-      if (missing)
-        throw new Error(`${missing} missing in the file`, {
-          cause: 'Clear cache or try getting the file from another page',
-        });
-
       // test api
-      const testApi = await crmGetOrgDetails(project?.domain, config);
-      if (!testApi) throw new Error('Fail testing api');
+      const { error: errorTesting, data } = await crmGetFunctions(
+        project?.domain,
+        config,
+      );
+      if (errorTesting) throw errorTesting;
 
       const { error } = await supabase
         .from('crm')
@@ -94,8 +91,7 @@ export default function DialogSettingsCRM() {
       setIsOpen(false);
     },
     onError: (err) => {
-      console.log(err);
-      toast.error(err.message || 'Error loading file');
+      toast.error(err.message || 'Something wrong went');
     },
   });
 

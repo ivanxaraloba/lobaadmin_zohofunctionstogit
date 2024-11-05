@@ -25,7 +25,9 @@ export const crmGetFunctions = async (domain, config) => {
 
     return { data: functions, error: null };
   } catch (err) {
-    return { data: null, error: err.response.data };
+    console.log(err);
+
+    return { data: null, error: err?.response?.data || 'Internal error' };
   }
 };
 
@@ -36,18 +38,5 @@ export const crmGetFunction = async (domain, config, functionInfo) => {
     return { data: response.data?.functions?.[0], error: null };
   } catch (err) {
     return { data: null, error: `error crmGetFunction, ${functionInfo}` };
-  }
-};
-
-export const crmGetOrgDetails = async (domain, config) => {
-  try {
-    const response = await axios.get(
-      `https://crm.zoho.${domain}/crm/v2/organizations?include=info&from=crm_org_profile`,
-      { headers: config },
-    );
-    return response?.data ?? null;
-  } catch (err) {
-    console.error('Error fetching Zoho functions:', err);
-    return [];
   }
 };

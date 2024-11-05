@@ -37,12 +37,13 @@ import {
 } from '@/components/layout/app-tab';
 import ButtonCommitsHistory from '@/components/shared/button-commits-history';
 import { ButtonCommitsNew } from '@/components/shared/button-commits-new';
+import ButtonGenerateDoc from '@/components/shared/button-generate-doc';
 import { ButtonPush } from '@/components/shared/button-push';
 import CardContainer from '@/components/shared/card-container';
-import ScriptViewer from '@/components/shared/code-viewer';
 import ListHeaderFunction from '@/components/shared/list-header-functions';
 import ListItemFunction from '@/components/shared/list-item-function';
 import PopoverFilters from '@/components/shared/popover-filters';
+import ScriptViewer from '@/components/shared/script-viewer';
 import SectionMissing from '@/components/shared/section-missing';
 import { TypographyH3 } from '@/components/typography/typography-h3';
 import { Button } from '@/components/ui/button';
@@ -57,8 +58,8 @@ import InputSearch from '@/components/ui/input-search';
 import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { useProjectStore } from '@/stores/project';
-import { useFilters } from '@/hooks/useFilters';
-import { useSearch } from '@/hooks/useSearch';
+import { useFilters } from '@/hooks/use-filters';
+import { useSearch } from '@/hooks/use-search';
 import {
   DEPARMENTS,
   FUNCTIONS_CATEGORIES_LIST,
@@ -446,6 +447,10 @@ export default function TabFunctions({ username }: { username: string }) {
                         />
                         <ButtonCommitsHistory
                           commits={queryCommits.data?.obj[activeFn.id]}
+                        />
+                        <ButtonGenerateDoc
+                          functionName={activeFn.display_name}
+                          code={activeFn?.workflow}
                         />
                         <Link
                           target="_blank"

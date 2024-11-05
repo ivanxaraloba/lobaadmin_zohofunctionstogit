@@ -39,10 +39,10 @@ import { ButtonCommitsNew } from '@/components/shared/button-commits-new';
 import { ButtonPush } from '@/components/shared/button-push';
 import { PushToGitButton } from '@/components/shared/button-push-to-git';
 import CardContainer from '@/components/shared/card-container';
-import ScriptViewer from '@/components/shared/code-viewer';
 import ListHeaderFunction from '@/components/shared/list-header-functions';
 import ListItemFunction from '@/components/shared/list-item-function';
 import PopoverFilters from '@/components/shared/popover-filters';
+import ScriptViewer from '@/components/shared/script-viewer';
 import SectionMissing from '@/components/shared/section-missing';
 import { TypographyH1 } from '@/components/typography/typography-h1';
 import { TypographyH2 } from '@/components/typography/typography-h2';
@@ -58,7 +58,6 @@ import Description from '@/components/ui/description';
 import InputSearch from '@/components/ui/input-search';
 import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
-import SearchInput from '@/components/ui/search-input';
 import {
   Tooltip,
   TooltipContent,
@@ -66,8 +65,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useProjectStore } from '@/stores/project';
-import { useFilters } from '@/hooks/useFilters';
-import { useSearch } from '@/hooks/useSearch';
+import { useFilters } from '@/hooks/use-filters';
+import { useSearch } from '@/hooks/use-search';
 import { DEPARMENTS } from '@/utils/constants';
 import { matchByWords } from '@/utils/filters';
 import { arr, str, time } from '@/utils/generic';

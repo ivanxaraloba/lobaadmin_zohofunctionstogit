@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 
+import { crmGetFunctions } from '@/helpers/zoho/crm';
 import { supabase } from '@/lib/supabase/client';
 import { Project } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { DialogDescription } from '@radix-ui/react-dialog';
 import { PlusIcon } from '@radix-ui/react-icons';
 import { useMutation } from '@tanstack/react-query';
 import { LoaderCircle, Settings } from 'lucide-react';
@@ -31,18 +33,19 @@ import {
 import { useGlobalStore } from '@/stores/global';
 import { useProjectStore } from '@/stores/project';
 import { BUCKETS } from '@/utils/constants';
-import { files, obj } from '@/utils/generic';
+import { files, obj, type } from '@/utils/generic';
 
 import { Button } from '../ui/button';
 import ButtonLoading from '../ui/button-loading';
-import { Input } from '../ui/input';
+import Description from '../ui/description';
+import { Textarea } from '../ui/textarea';
 import VideoPlayerSettings from './video-player-settings';
 
 const formSchema = z.object({
-  file: z.instanceof(File),
+  har: z.string().min(3),
 });
 
-export default function DialogSettingsRecruit() {
+export default function DialogSettingsCRM2() {
   const { project, getProject } = useProjectStore();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -50,29 +53,36 @@ export default function DialogSettingsRecruit() {
     mode: 'onChange',
     resolver: zodResolver(formSchema),
     defaultValues: {
-      file: undefined,
+      har: '',
     },
   });
 
-  const mutationUpdateSettings = useMutation({
-    mutationFn: async ({ file }: { file: any }) => {
-      const content = await files.read(file);
-      const json = JSON.parse(content);
+  const mutationCreateProject = useMutation({
+    mutationFn: async ({ har }: { har: string }) => {
+      if (!type.isJson(har)) throw Error('The har text is not a json');
+      har = JSON.parse(har);
 
-      let config = {
-        cookie: obj.findToken(json, 'cookie', { filterString: 'CSRF_TOKEN' }),
-        'x-recruit-org': obj.findToken(json, 'x-recruit-org'),
-        'x-zcsrf-token': obj.findToken(json, 'x-zcsrf-token'),
-        'user-agent': obj.findToken(json, 'user-agent'),
+      const config = {
+        cookie:
+          obj.findToken(har, 'cookie', { filterString: 'zVisitCount' }) ||
+          obj.findToken(har, 'Cookie', { caseSensitive: true }),
+        'x-crm-org': obj.findToken(har, 'x-crm-org'),
+        'x-zcsrf-token': obj.findToken(har, 'x-zcsrf-token'),
+        'user-agent': obj.findToken(har, 'user-agent'),
       };
 
-      // @ts-ignore
-      const missing = Object.keys(config).filter((key) => !config[key])[0];
-      if (missing) throw new Error(`${missing} missing in the file`);
+      console.log(config);
+
+      // test api
+      const { error: errorTesting, data } = await crmGetFunctions(
+        project?.domain,
+        config,
+      );
+      if (errorTesting) throw errorTesting;
 
       const { error } = await supabase
-        .from('recruit')
-        .upsert({ id: project?.recruit?.id, projectId: project?.id, config });
+        .from('crm')
+        .upsert({ id: project?.crm?.id, projectId: project?.id, config });
       if (error) throw error;
     },
     onSuccess: async () => {
@@ -82,16 +92,16 @@ export default function DialogSettingsRecruit() {
       setIsOpen(false);
     },
     onError: (err) => {
-      // @ts-ignore
-      toast.error(err.message || 'Error loading file', { description: err.cause });
+      toast.error(err.message || 'Something went wrong');
     },
   });
 
   const onSubmit = (data: any) => {
-    mutationUpdateSettings.mutate(data);
+    mutationCreateProject.mutate(data);
   };
 
   useEffect(() => {
+    // @ts-ignore
     form.reset({ ...project });
   }, [project?.id]);
 
@@ -115,30 +125,27 @@ export default function DialogSettingsRecruit() {
             >
               <FormField
                 control={form.control}
-                name="file"
+                name="har"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>File .Har</FormLabel>
+                    <FormLabel>Config JSON</FormLabel>
                     <FormControl>
-                      <Input
-                        type="file"
-                        accept=".har"
-                        onChange={(e) => {
-                          if (e.target.files?.[0]) {
-                            field.onChange(e.target.files[0]);
-                          }
-                        }}
+                      <Textarea
+                        {...field}
+                        className="textarea"
+                        rows={10}
+                        placeholder="Paste your har here..."
                       />
                     </FormControl>
                     <FormMessage />
-                    <FormDescription>Retrieve the file from the homepage</FormDescription>
+                    <FormDescription>Paste your har JSON</FormDescription>
                   </FormItem>
                 )}
               />
               <ButtonLoading
                 className="w-full"
                 type="submit"
-                loading={mutationUpdateSettings.isPending}
+                loading={mutationCreateProject.isPending}
               >
                 Save Changes
               </ButtonLoading>

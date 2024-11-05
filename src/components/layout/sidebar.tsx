@@ -15,6 +15,7 @@ interface Route {
   name?: string;
   to: string;
   icon: any;
+  separate?: boolean;
   className?: string;
 }
 
@@ -42,18 +43,25 @@ export default function Sidebar({
           {/* Routes */}
           <div className="mt-5 flex flex-col gap-1">
             {routes.map((item: any, index: number) => (
-              <Link key={item.to} href={item.to}>
-                <Button
-                  variant={pathname === item.to ? 'secondary' : 'ghost'}
-                  className={cn('h-12 w-full items-center justify-start', item.className)}
-                >
-                  <item.icon
-                    className={cn('size-5', item.classNameIcon)}
-                    strokeWidth={1.5}
-                  />
-                  {!onlyIcons && <span className="font-medium">{item.name}</span>}
-                </Button>
-              </Link>
+              <React.Fragment key={item.to}>
+                <Link href={item.to}>
+                  <Button
+                    variant={pathname === item.to ? 'secondary' : 'ghost'}
+                    className={cn(
+                      'h-12 w-full items-center justify-start',
+                      item.className,
+                    )}
+                  >
+                    <item.icon
+                      className={cn('size-5', item.classNameIcon)}
+                      strokeWidth={1.5}
+                    />
+                    {!onlyIcons && <span className="font-medium">{item.name}</span>}
+                  </Button>
+                </Link>
+                {/* Add border except after the last item */}
+                {!!item.separate && <hr className="mx-1" />}
+              </React.Fragment>
             ))}
           </div>
 

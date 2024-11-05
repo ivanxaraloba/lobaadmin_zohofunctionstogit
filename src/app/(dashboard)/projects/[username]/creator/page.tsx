@@ -9,16 +9,26 @@ import { creatorApp, Project } from '@/types/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
-import { Angry, ArrowUpFromLine, Book, FolderCode, RefreshCcw, Trash, TriangleAlert, X } from 'lucide-react';
+import {
+  Angry,
+  ArrowUpFromLine,
+  Book,
+  FolderCode,
+  RefreshCcw,
+  Trash,
+  TriangleAlert,
+  X,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
+import { ButtonNavTabs } from '@/components/layout/nav-tabs';
 import { PushToGitButton } from '@/components/shared/button-push-to-git';
-import ScriptViewer from '@/components/shared/code-viewer';
 import DialogConfirmation from '@/components/shared/dialog-confirmation';
 import DialogCreateCreatorApp from '@/components/shared/dialog-create-creator-app';
 import DialogSettingsCreator from '@/components/shared/dialog-settings-creator';
 import LoadingScreen from '@/components/shared/loading-screen';
+import ScriptViewer from '@/components/shared/script-viewer';
 import SectionMissing from '@/components/shared/section-missing';
 import { TypographyH1 } from '@/components/typography/typography-h1';
 import { TypographyH2 } from '@/components/typography/typography-h2';
@@ -34,7 +44,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { ButtonNavTabs } from '@/components/vercel/button-nav-tabs';
 import { useGlobalStore } from '@/stores/global';
 import { useProjectStore } from '@/stores/project';
 import { str, time } from '@/utils/generic';
@@ -97,7 +106,7 @@ export default function Page({ params }: { params: { username: string } }) {
                         variant={app?.id === item.id ? 'default' : 'outline'}
                         onClick={() => setApp(item)}
                         size="sm"
-                        className="group relative rounded-full px-6"
+                        className="group relative gap-0 rounded-full px-6"
                       >
                         <span>{item.name}</span>
                         <DialogConfirmation
@@ -113,16 +122,30 @@ export default function Page({ params }: { params: { username: string } }) {
                 </div>
                 {app?.id && (
                   <div className="mt-10">
-                    <ButtonNavTabs tabs={TABS} activeTabId={activeTab} toggle={setActiveTab} springy />
-                    {activeTab === 'workflows' && <TabWorkflows username={username} app={app} setApp={setApp} />}
+                    <ButtonNavTabs
+                      tabs={TABS}
+                      activeTabId={activeTab}
+                      toggle={setActiveTab}
+                      springy
+                    />
+                    {activeTab === 'workflows' && (
+                      <TabWorkflows username={username} app={app} setApp={setApp} />
+                    )}
                     {activeTab === 'functions' && (
-                      <SectionMissing icon={Angry} message="Espera um pouco ainda estou a fazer" className="mt-10" />
+                      <SectionMissing
+                        icon={Angry}
+                        message="Espera um pouco ainda estou a fazer"
+                        className="mt-10"
+                      />
                     )}
                   </div>
                 )}
               </>
             ) : (
-              <SectionMissing icon={TriangleAlert} message="Set up settings to continue" />
+              <SectionMissing
+                icon={TriangleAlert}
+                message="Set up settings to continue"
+              />
             )}
           </>
         )}

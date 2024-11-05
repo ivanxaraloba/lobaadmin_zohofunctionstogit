@@ -36,9 +36,11 @@ export const DEPARMENTS = {
   INTERNOS: 2,
 };
 
+export const LOGS_TYPES = ['success', 'error', 'warning', 'info'];
+
 export const LOGS_TYPES_COLORS = {
-  success: 'bg-green-600',
-  error: 'bg-red-600',
-  warning: 'bg-yellow-600',
-  info: 'bg-zinc-600',
+  [LOGS_TYPES[0]]: '#4ade80',
+  [LOGS_TYPES[1]]: '#f87171',
+  [LOGS_TYPES[2]]: '#facc15',
+  [LOGS_TYPES[3]]: '#a1a1aa',
 };

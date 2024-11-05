@@ -35,10 +35,11 @@ export default function RootLayout({
       icon: LayoutDashboard,
       to: `/projects/${username}`,
     },
-    // {
-    //   icon: Logs,
-    //   to: `/projects/${username}/logs`,
-    // },
+    {
+      icon: Logs,
+      to: `/projects/${username}/logs`,
+      separate: true,
+    },
     {
       icon: LogoCrm,
       to: `/projects/${username}/crm`,

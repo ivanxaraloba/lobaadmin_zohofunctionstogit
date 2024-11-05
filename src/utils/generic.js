@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { formatDistanceToNow } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { pt } from 'date-fns/locale';
@@ -80,7 +82,9 @@ export const arr = {
 };
 
 export const obj = {
-  findToken: (obj, findName, filterString = '') => {
+  findToken: (obj, findName, options = {}) => {
+    const { filterString = '', caseSensitive = false } = options;
+
     let result = '';
 
     function search(item) {
@@ -89,10 +93,19 @@ export const obj = {
           search(element);
         }
       } else if (item !== null && typeof item === 'object') {
-        if (item.name === findName && (filterString === '' || (item.value && item.value.includes(filterString)))) {
+        const nameMatches = caseSensitive
+          ? item.name === findName
+          : item.name?.toLowerCase() === findName.toLowerCase();
+
+        const filterMatches = caseSensitive
+          ? item.value?.includes(filterString)
+          : item.value?.toLowerCase().includes(filterString.toLowerCase());
+
+        if (nameMatches && (filterString === '' || filterMatches)) {
           result = item.value;
           return;
         }
+
         for (const key in item) {
           if (item.hasOwnProperty(key)) {
             search(item[key]);
@@ -143,7 +156,8 @@ export const str = {
   },
   decodeHtmlSpecialChars: (str) => {
     const parser = new DOMParser();
-    const decodedString = parser.parseFromString(str, 'text/html').documentElement.textContent;
+    const decodedString = parser.parseFromString(str, 'text/html').documentElement
+      .textContent;
     return decodedString;
   },
 };
@@ -171,5 +185,16 @@ export const time = {
     return new Date(datetime).setTime(
       new Date(datetime).getTime() + new Date(datetime).getTimezoneOffset() * 60 * 1000,
     );
+  },
+};
+
+export const type = {
+  isJson: (input) => {
+    try {
+      JSON.parse(input);
+      return true;
+    } catch {
+      return false;
+    }
   },
 };

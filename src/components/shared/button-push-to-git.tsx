@@ -2,8 +2,14 @@ import { useEffect, useState } from 'react';
 
 import { ArrowUpFromLine } from 'lucide-react';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { usePushToGit } from '@/hooks/usePushToGit';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { usePushToGit } from '@/hooks/use-push-to-git';
 
 import ButtonLoading from '../ui/button-loading';
 import { Input } from '../ui/input';
@@ -14,7 +20,11 @@ interface Props {
   onSuccess?: () => Function | Promise<void>;
 }
 
-export const PushToGitButton: React.FC<Props> = ({ project, data, onSuccess = async () => {} }) => {
+export const PushToGitButton: React.FC<Props> = ({
+  project,
+  data,
+  onSuccess = async () => {},
+}) => {
   const [message, setMessage] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const mutationPushToGit = usePushToGit({
@@ -30,7 +40,11 @@ export const PushToGitButton: React.FC<Props> = ({ project, data, onSuccess = as
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <ButtonLoading variant="secondary" icon={ArrowUpFromLine} onClick={() => setIsDialogOpen(true)}>
+        <ButtonLoading
+          variant="secondary"
+          icon={ArrowUpFromLine}
+          onClick={() => setIsDialogOpen(true)}
+        >
           <span>Push to Git</span>
         </ButtonLoading>
       </DialogTrigger>
@@ -38,7 +52,11 @@ export const PushToGitButton: React.FC<Props> = ({ project, data, onSuccess = as
         <DialogHeader>
           <DialogTitle>Commit message</DialogTitle>
         </DialogHeader>
-        <Input type="text" placeholder="Your commit message" onChange={(e) => setMessage(e.target.value)} />
+        <Input
+          type="text"
+          placeholder="Your commit message"
+          onChange={(e) => setMessage(e.target.value)}
+        />
         <ButtonLoading
           icon={ArrowUpFromLine}
           loading={mutationPushToGit.isPending}

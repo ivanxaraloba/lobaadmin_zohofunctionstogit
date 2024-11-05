@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { ButtonNavTabs } from '@/components/layout/nav-tabs';
 import CardContainer from '@/components/shared/card-container';
 import DialogConfirmation from '@/components/shared/dialog-confirmation';
 import LoadingScreen from '@/components/shared/loading-screen';
@@ -34,7 +35,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { ButtonNavTabs } from '@/components/vercel/button-nav-tabs';
 import { useGlobalStore } from '@/stores/global';
 import { useProjectStore } from '@/stores/project';
 import { str } from '@/utils/generic';
