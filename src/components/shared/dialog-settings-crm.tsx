@@ -33,7 +33,7 @@ import {
 import { useGlobalStore } from '@/stores/global';
 import { useProjectStore } from '@/stores/project';
 import { BUCKETS } from '@/utils/constants';
-import { files, obj, type, str } from '@/utils/generic';
+import { files, obj, str, type } from '@/utils/generic';
 
 import { Button } from '../ui/button';
 import ButtonLoading from '../ui/button-loading';
@@ -42,7 +42,7 @@ import { Textarea } from '../ui/textarea';
 import VideoPlayerSettings from './video-player-settings';
 
 const formSchema = z.object({
-  har: z.string().min(3),
+  curl: z.string().min(3),
 });
 
 export default function DialogSettingsCRM2() {
@@ -53,20 +53,13 @@ export default function DialogSettingsCRM2() {
     mode: 'onChange',
     resolver: zodResolver(formSchema),
     defaultValues: {
-      har: '',
+      curl: '',
     },
   });
 
   const mutationCreateProject = useMutation({
-    mutationFn: async ({ har }: { har: string }) => {
-      har = str.parseCURL(har);
-
-      const config = {
-        cookie: har.cookie,
-        'x-crm-org': har['x-crm-org'],
-        'x-zcsrf-token': har['x-zcsrf-token'],
-        'user-agent': har['user-agent'],
-      };
+    mutationFn: async ({ curl }: { curl: string }) => {
+      const config = str.parseCURL(curl);
 
       // test api
       const { error: errorTesting, data } = await crmGetFunctions(
@@ -100,8 +93,6 @@ export default function DialogSettingsCRM2() {
     form.reset({ ...project });
   }, [project?.id]);
 
-
-
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -122,7 +113,7 @@ export default function DialogSettingsCRM2() {
             >
               <FormField
                 control={form.control}
-                name="har"
+                name="curl"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>cURL</FormLabel>
