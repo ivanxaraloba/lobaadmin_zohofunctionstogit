@@ -257,12 +257,11 @@ export default function Page() {
                       <span className="text-primary">{form.watch('username')}</span>
                     </Description>
                   </CardContainer>
-                  <div className="mt-10 flex items-center justify-end gap-4">
+                  <CardContainer className="flex items-center justify-end gap-4"> 
                     <DialogConfirmation
                       button={
                         <Button variant="destructive" type="button">
                           <span>Delete</span>
-                          <Trash className="ml-2 size-4" />
                         </Button>
                       }
                       action={() => mutationDeleteProject.mutate()}
@@ -270,12 +269,11 @@ export default function Page() {
 
                     <ButtonLoading
                       type="submit"
-                      icon={Check}
                       loading={mutationUpdateProject.isPending}
                     >
                       Update
                     </ButtonLoading>
-                  </div>
+                  </CardContainer>
                 </form>
               </Form>
             </div>

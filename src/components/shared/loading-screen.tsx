@@ -9,7 +9,7 @@ export default function LoadingScreen() {
   return (
     <>
       <div>
-        <div className="absolute left-0 top-0 w-full items-center justify-center bg-background/50">
+        <div className="fixed left-0 top-0 w-full items-center justify-center bg-background/50">
           <div className="flex h-screen w-full flex-col items-center justify-center gap-2">
             {/* <TypographyH3 className="text-muted-foreground">Z2G</TypographyH3> */}
             {/* <div className="flex space-x-2">

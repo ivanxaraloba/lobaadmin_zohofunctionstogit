@@ -189,8 +189,6 @@ const columns: ColumnDefExtended<any>[] = [
 export default function Page({ params }: { params: { username: string } }) {
   const { project } = useProjectStore();
 
-  const [viewRow, setViewRow] = useState<any>(null);
-
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -253,42 +251,6 @@ export default function Page({ params }: { params: { username: string } }) {
   return (
     <>
       {!project && <LoadingScreen />}
-
-      {viewRow && (
-        <Dialog open={viewRow} onOpenChange={setViewRow}>
-          <DialogContent className="min-w-96 sm:max-w-2xl">
-            <DialogHeader className="border-b pb-2">
-              <DialogTitle>
-                <div
-                  className="mr-2 inline-flex size-2 rounded-full"
-                  style={{
-                    // @ts-ignore
-                    backgroundColor: LOGS_TYPES_COLORS[viewRow.original.type],
-                  }}
-                />
-                <span>{viewRow.original.function}</span>
-              </DialogTitle>
-              <DialogDescription>
-                {time.timeAgo(viewRow.original.created_at)} -{' '}
-                {format(viewRow.original.created_at, 'dd-MM-yyyy HH:mm:ss')}
-              </DialogDescription>
-            </DialogHeader>
-            <span className="h-96 max-h-96 overflow-auto whitespace-pre-wrap">
-              {type.isJson(viewRow.original.notes) ? (
-                <JsonViewer
-                  value={JSON.parse(viewRow.original.notes)}
-                  theme="dark"
-                  displayDataTypes={false}
-                  rootName={false}
-                  collapseStringsAfterLength={20}
-                />
-              ) : (
-                viewRow.original.notes
-              )}
-            </span>
-          </DialogContent>
-        </Dialog>
-      )}
 
       <div className="flex flex-col">
         <div className="flex items-center gap-4 pb-10 text-xs">

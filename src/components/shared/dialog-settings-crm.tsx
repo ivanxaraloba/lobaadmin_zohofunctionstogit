@@ -4,12 +4,10 @@ import React, { useEffect, useState } from 'react';
 
 import { crmGetFunctions } from '@/helpers/zoho/crm';
 import { supabase } from '@/lib/supabase/client';
-import { Project } from '@/types/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DialogDescription } from '@radix-ui/react-dialog';
-import { PlusIcon } from '@radix-ui/react-icons';
 import { useMutation } from '@tanstack/react-query';
-import { LoaderCircle, Settings } from 'lucide-react';
+import { Settings } from 'lucide-react';
+import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -30,16 +28,14 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useGlobalStore } from '@/stores/global';
 import { useProjectStore } from '@/stores/project';
 import { BUCKETS } from '@/utils/constants';
-import { files, obj, str, type } from '@/utils/generic';
+import { str } from '@/utils/generic';
 
 import { Button } from '../ui/button';
 import ButtonLoading from '../ui/button-loading';
 import Description from '../ui/description';
 import { Textarea } from '../ui/textarea';
-import VideoPlayerSettings from './video-player-settings';
 
 const formSchema = z.object({
   curl: z.string().min(3),
@@ -95,7 +91,13 @@ export default function DialogSettingsCRM2() {
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog
+        open={isOpen}
+        onOpenChange={() => {
+          form.setValue('curl', '');
+          setIsOpen(!isOpen);
+        }}
+      >
         <DialogTrigger asChild>
           <Button variant="ghost" size="icon">
             <Settings className="size-4" />
@@ -104,7 +106,6 @@ export default function DialogSettingsCRM2() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Settings</DialogTitle>
-            <VideoPlayerSettings src={`${BUCKETS.SETTINGS}/settings_crm.mp4`} />
           </DialogHeader>
           <Form {...form}>
             <form
@@ -120,13 +121,45 @@ export default function DialogSettingsCRM2() {
                     <FormControl>
                       <Textarea
                         {...field}
-                        className="textarea"
-                        rows={10}
+                        className="textarea resize-none"
                         placeholder="Paste your cURL here..."
                       />
                     </FormControl>
+
+                    <Dialog>
+                      <DialogTrigger className="w-fit">
+                        <FormDescription>
+                          Need help getting the cURL?{' '}
+                          <span className="underline underline-offset-2">Click here</span>
+                        </FormDescription>
+                      </DialogTrigger>
+                      <DialogContent className="!w-7/12 !max-w-full !border-none">
+                        <DialogTitle>Follow these steps to copy cURL</DialogTitle>
+                        <ol className="list-decimal space-y-1 pl-5 text-xs">
+                          <li>
+                            Open the browser’s <strong>Inspector</strong> and go to the{' '}
+                            <strong>Network</strong> tab.
+                          </li>
+                          <li>
+                            Right-click a request that fetches app data (look for one with
+                            cookies).
+                          </li>
+                          <li>
+                            Select <strong>Copy</strong> <strong>Copy as cURL</strong> (on
+                            Mac) or <strong>Copy as cURL (bash)</strong> (on Windows).
+                          </li>
+                        </ol>
+                        <Image
+                          alt="crm_settings_image"
+                          src={`${BUCKETS.SETTINGS}/settings_crm.png`}
+                          className="w-full"
+                          width={1000}
+                          height={500}
+                        />
+                      </DialogContent>
+                    </Dialog>
+
                     <FormMessage />
-                    <FormDescription>Paste here cURL text</FormDescription>
                   </FormItem>
                 )}
               />

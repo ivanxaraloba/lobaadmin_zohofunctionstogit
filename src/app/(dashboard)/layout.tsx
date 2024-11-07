@@ -2,11 +2,13 @@
 
 import React, { useEffect } from 'react';
 
+import { useQuery } from '@tanstack/react-query';
 import { Braces, PanelsTopLeft } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
 import Sidebar from '@/components/layout/sidebar';
 import FormSetupBitbucket from '@/components/shared/form-setup-bitbucket';
+import LoadingScreen from '@/components/shared/loading-screen';
 import Description from '@/components/ui/description';
 import { useGlobalStore } from '@/stores/global';
 
@@ -29,13 +31,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   ];
 
   const { user, getUser } = useGlobalStore();
-
-  useEffect(() => {
-    const fetch = async () => {
+  const queryUser = useQuery<any>({
+    queryKey: ['user'],
+    queryFn: async () => {
       if (!user) await getUser();
-    };
-    fetch();
-  }, []);
+    },
+  });
+
+  if (queryUser.isLoading) {
+    return <LoadingScreen />;
+  }
 
   if (!user) {
     return <PageLogin />;
