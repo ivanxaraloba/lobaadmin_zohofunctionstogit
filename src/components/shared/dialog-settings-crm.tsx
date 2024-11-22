@@ -58,7 +58,7 @@ export default function DialogSettingsCRM() {
     },
   });
 
-  const mutationCreateProject = useMutation({
+  const mutationUpdateConfig = useMutation({
     mutationFn: async ({ curl }: { curl: string }) => {
       const config = str.parseCURL(curl);
 
@@ -96,7 +96,7 @@ export default function DialogSettingsCRM() {
   });
 
   const onSubmit = (data: any) => {
-    mutationCreateProject.mutate(data);
+    mutationUpdateConfig.mutate(data);
   };
 
   useEffect(() => {
@@ -150,7 +150,7 @@ export default function DialogSettingsCRM() {
               <ButtonLoading
                 className="w-full"
                 type="submit"
-                loading={mutationCreateProject.isPending}
+                loading={mutationUpdateConfig.isPending}
               >
                 Save Changes
               </ButtonLoading>
