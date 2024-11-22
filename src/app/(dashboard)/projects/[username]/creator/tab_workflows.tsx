@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 
-import { creatorGetAppStructure, creatorGetFunction } from '@/helpers/zoho/creator';
+import {
+  creatorGetAppStructure,
+  creatorGetFunction,
+} from '@/helpers/zoho/creator';
 import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import { Commit, creatorApp } from '@/types/types';
@@ -78,7 +81,11 @@ interface Props {
   setApp: any;
 }
 
-export default function TabWorkflows({ username, app, setApp }: Props) {
+export default function TabWorkflows({
+  username,
+  app,
+  setApp,
+}: Props) {
   const PATH_TAB = `creator/${app?.name}/workflows`;
 
   const searchParams = useSearchParams();
@@ -127,7 +134,9 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
       return {
         arr: data,
         obj: arr.groupInObj(data, 'functionId'),
-        pending: (data || []).filter((c: Commit) => c.status === 'pending'),
+        pending: (data || []).filter(
+          (c: Commit) => c.status === 'pending',
+        ),
       };
     },
   });
@@ -136,12 +145,15 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
     mutationFn: async () => {
       if (!project) throw new Error('Project data is not available.');
 
-      const { data: accordian, error: errorAccordian } = await creatorGetAppStructure(
-        project.domain,
-        project.creator?.config,
-        project.creator?.owner,
-        app?.name,
-      );
+      console.log(project.creator?.config);
+
+      const { data: accordian, error: errorAccordian } =
+        await creatorGetAppStructure(
+          project.domain,
+          project.creator?.config,
+          project.creator?.owner,
+          app?.name,
+        );
 
       if (errorAccordian) throw errorAccordian;
 
@@ -239,16 +251,25 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
         key: 'tags',
         type: 'array',
         matchFn: (data: any, value: string[]) => {
-          if (value.includes('empty_function')) return !data.script?.length;
-          const commits = queryCommits.data.obj[data.WFLinkName] || [];
+          if (value.includes('empty_function'))
+            return !data.script?.length;
+          const commits =
+            queryCommits.data.obj[data.WFLinkName] || [];
           if (value.includes('committed')) return commits?.length;
           if (value.includes('pending_commits'))
-            return !!commits.filter((c: Commit) => c.status === 'pending')?.length;
+            return !!commits.filter(
+              (c: Commit) => c.status === 'pending',
+            )?.length;
         },
       },
     ],
     searchMatchFn: (data: any, searchValue: string) => {
-      return matchByWords(data, searchValue, ['WFName', 'script'], searchMatches);
+      return matchByWords(
+        data,
+        searchValue,
+        ['WFName', 'script'],
+        searchMatches,
+      );
     },
   });
   const functions = arr.groupInArr(data, 'report');
@@ -267,13 +288,16 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                 A total of {app?.accordian?.length || 0} workflows
               </AppTabDescription>
               <AppTabDescription icon={RefreshCcw}>
-                Last sync occurred {time.timeAgo(project?.crm?.lastSync) || '-'}
+                Last sync occurred{' '}
+                {time.timeAgo(project?.crm?.lastSync) || '-'}
               </AppTabDescription>
-              {!!project?._repository && project?.departments?.id === DEPARMENTS.FTE && (
-                <AppTabDescription icon={ArrowUpFromLine}>
-                  Last commit occurred {time.timeAgo(project?.crm?.lastCommit) || '-'}
-                </AppTabDescription>
-              )}
+              {!!project?._repository &&
+                project?.departments?.id === DEPARMENTS.FTE && (
+                  <AppTabDescription icon={ArrowUpFromLine}>
+                    Last commit occurred{' '}
+                    {time.timeAgo(project?.crm?.lastCommit) || '-'}
+                  </AppTabDescription>
+                )}
               {!!project?._repository && !!app?.lastCommit && (
                 <Description className="mt-4 flex items-center gap-2">
                   <Link
@@ -357,7 +381,9 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                         icon: ArrowUpFromLine,
                       },
                     ]}
-                    onValueChange={(e: any) => setFilters({ tags: e })}
+                    onValueChange={(e: any) =>
+                      setFilters({ tags: e })
+                    }
                     placeholder="Select tags"
                     maxCount={3}
                   />
@@ -373,35 +399,53 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                     activeFn ? 'col-span-1' : 'col-span-3',
                   )}
                 >
-                  {functions.map(({ label, items }: any, index: any) => {
-                    return (
-                      <Collapsible key={index} defaultOpen={true}>
-                        <CardContainer>
-                          <ListHeaderFunction label={label} length={items.length} />
-                          <CollapsibleContent className="mt-4">
-                            {items?.length > 0 && (
-                              <div className="flex flex-col gap-2">
-                                {items.map((functionInfo: any, i: number) => {
-                                  return (
-                                    <ListItemFunction
-                                      key={i}
-                                      activeFn={activeFn}
-                                      setActiveFn={setActiveFn}
-                                      functionInfo={functionInfo}
-                                      functionName={functionInfo.WFName}
-                                      functionCode={functionInfo.script}
-                                      functionId={functionInfo.WFLinkName}
-                                      commitsObj={queryCommits.data.obj}
-                                    />
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </CollapsibleContent>
-                        </CardContainer>
-                      </Collapsible>
-                    );
-                  })}
+                  {functions.map(
+                    ({ label, items }: any, index: any) => {
+                      return (
+                        <Collapsible key={index} defaultOpen={true}>
+                          <CardContainer>
+                            <ListHeaderFunction
+                              label={label}
+                              length={items.length}
+                            />
+                            <CollapsibleContent className="mt-4">
+                              {items?.length > 0 && (
+                                <div className="flex flex-col gap-2">
+                                  {items.map(
+                                    (
+                                      functionInfo: any,
+                                      i: number,
+                                    ) => {
+                                      return (
+                                        <ListItemFunction
+                                          key={i}
+                                          activeFn={activeFn}
+                                          setActiveFn={setActiveFn}
+                                          functionInfo={functionInfo}
+                                          functionName={
+                                            functionInfo.WFName
+                                          }
+                                          functionCode={
+                                            functionInfo.script
+                                          }
+                                          functionId={
+                                            functionInfo.WFLinkName
+                                          }
+                                          commitsObj={
+                                            queryCommits.data.obj
+                                          }
+                                        />
+                                      );
+                                    },
+                                  )}
+                                </div>
+                              )}
+                            </CollapsibleContent>
+                          </CardContainer>
+                        </Collapsible>
+                      );
+                    },
+                  )}
                 </div>
                 {/* Code */}
                 {activeFn && (
@@ -421,7 +465,11 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                           path={PATH_TAB}
                         />
                         <ButtonCommitsHistory
-                          commits={queryCommits.data?.obj[activeFn.WFLinkName]}
+                          commits={
+                            queryCommits.data?.obj[
+                              activeFn.WFLinkName
+                            ]
+                          }
                         />
                         <Link
                           target="_blank"
@@ -442,18 +490,27 @@ export default function TabWorkflows({ username, app, setApp }: Props) {
                       </div>
                     </div>
                     {/* Code */}
-                    <ScriptViewer className="mt-2 w-full" script={activeFn?.script} />
+                    <ScriptViewer
+                      className="mt-2 w-full"
+                      value={activeFn?.script}
+                    />
                   </CardContainer>
                 )}
               </AppTabContentBody>
             ) : (
               // Empty data with filters
-              <SectionMissing icon={SearchX} message="No matching workflows found" />
+              <SectionMissing
+                icon={SearchX}
+                message="No matching workflows found"
+              />
             )}
           </AppTabContent>
         ) : (
           <AppTabContentMissing>
-            <SectionMissing icon={Frown} message="No workflows have been added yet" />
+            <SectionMissing
+              icon={Frown}
+              message="No workflows have been added yet"
+            />
           </AppTabContentMissing>
         )}
       </>

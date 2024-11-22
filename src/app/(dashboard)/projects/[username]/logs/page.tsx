@@ -5,8 +5,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import { queryClient } from '@/providers/react-query';
+import { useTheme } from '@/providers/theme';
 import { MixerHorizontalIcon } from '@radix-ui/react-icons';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -30,6 +31,7 @@ import LoadingScreen from '@/components/shared/loading-screen';
 import { TypographyH1 } from '@/components/typography/typography-h1';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import ButtonLoading from '@/components/ui/button-loading';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
@@ -60,6 +62,7 @@ import { useProjectStore } from '@/stores/project';
 import { LOGS_TYPES, LOGS_TYPES_COLORS } from '@/utils/constants';
 import { time, type } from '@/utils/generic';
 
+
 type ColumnDefExtended<TData = any> = ColumnDef<TData> & {
   title?: string;
 };
@@ -73,7 +76,9 @@ const columns: ColumnDefExtended<any>[] = [
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        onCheckedChange={(value) =>
+          table.toggleAllPageRowsSelected(!!value)
+        }
         aria-label="Select all"
       />
     ),
@@ -90,13 +95,15 @@ const columns: ColumnDefExtended<any>[] = [
   {
     accessorKey: 'type',
     title: 'Type',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Type" />
+    ),
     cell: ({ row }) => (
       <Badge
         className="pointer-events-none rounded-full text-white shadow-none"
         style={{
           // @ts-ignore
-          backgroundColor: LOGS_TYPES_COLORS[row.original.type],
+          backgroundColor: `rgb(${LOGS_TYPES_COLORS[row.original.type]})`,
         }}
       >
         {row.original.type}
@@ -104,18 +111,24 @@ const columns: ColumnDefExtended<any>[] = [
     ),
     filterFn: (row, columnId, filterValues) => {
       // Apply 'or' filtering logic
-      return filterValues.some((val: any) => row.getValue(columnId) === val);
+      return filterValues.some(
+        (val: any) => row.getValue(columnId) === val,
+      );
     },
   },
   {
     accessorKey: 'function',
     title: 'Function',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Function" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Function" />
+    ),
   },
   {
     accessorKey: 'notes',
     title: 'Notes',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Notes" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Notes" />
+    ),
     cell: ({ row }) => (
       <div className="max-h-14 max-w-[500px] overflow-hidden break-words">
         {row.getValue('notes')}
@@ -125,7 +138,9 @@ const columns: ColumnDefExtended<any>[] = [
   {
     accessorKey: 'created_at',
     title: 'Created At',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Created At" />
+    ),
     cell: ({ row }) => (
       <span className="whitespace-nowrap">
         {format(row.getValue('created_at'), 'dd-MM-yyyy HH:mm:ss')}
@@ -157,7 +172,7 @@ const columns: ColumnDefExtended<any>[] = [
               <div
                 className="mr-2 inline-flex size-2 rounded-full"
                 style={{
-                  backgroundColor: LOGS_TYPES_COLORS[row.original.type],
+                  backgroundColor: `rgb(${LOGS_TYPES_COLORS[row.original.type]})`,
                 }}
               />
               <span>{row.original.function}</span>
@@ -186,13 +201,21 @@ const columns: ColumnDefExtended<any>[] = [
   },
 ];
 
-export default function Page({ params }: { params: { username: string } }) {
+export default function Page({
+  params,
+}: {
+  params: { username: string };
+}) {
+  const { theme } = useTheme();
   const { project } = useProjectStore();
+  const [recentItemIds, setRecentItemIds] = useState<string[]>([]);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] =
+    React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
 
   const queryLogs = useQuery<any>({
     queryKey: ['logs', project?.id],
@@ -224,6 +247,28 @@ export default function Page({ params }: { params: { username: string } }) {
     },
   });
 
+  const mutationDeleteLogs = useMutation({
+    mutationFn: async (data: any) => {
+      const { error } = await supabase
+        .from('logs')
+        .delete()
+        .eq('projectUsername', project?.username);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return true;
+    },
+    onSuccess: () => {
+      toast.success('All logs deleted successfully.');
+      queryLogs.refetch();
+    },
+    onError: (err) => {
+      toast.error(err.message || 'Error updating function');
+    },
+  });
+
   useEffect(() => {
     const changes = supabase
       .channel('table-logs-changes')
@@ -236,9 +281,23 @@ export default function Page({ params }: { params: { username: string } }) {
           filter: `projectUsername=eq.${project?.username}`,
         },
         (payload) => {
-          queryClient.setQueryData(['logs', project?.id], (prev: any[]) => {
-            return [payload.new, ...prev];
-          });
+          queryClient.setQueryData(
+            ['logs', project?.id],
+            (prev: any[]) => {
+              console.log(payload.new);
+
+              console.log({ prev });
+
+              return [payload.new, ...prev];
+            },
+          );
+
+          setRecentItemIds((prev) => [...prev, payload.new.id]);
+          setTimeout(() => {
+            setRecentItemIds((prev) =>
+              prev.filter((id) => id !== payload.new.id),
+            );
+          }, 2000);
         },
       )
       .subscribe();
@@ -315,6 +374,13 @@ const response = await fetch("https://lobaadmin-zohofunctionstogit.vercel.app/ap
             >
               Fetch
             </Button>
+            <ButtonLoading
+              variant="destructive"
+              loading={mutationDeleteLogs.isPending}
+              onClick={mutationDeleteLogs.mutate}
+            >
+              Clear Logs
+            </ButtonLoading>
           </div>
         </div>
         {/* table */}
@@ -323,9 +389,15 @@ const response = await fetch("https://lobaadmin-zohofunctionstogit.vercel.app/ap
             <Input
               className="max-w-sm"
               placeholder="Filter by function name..."
-              value={(table.getColumn('function')?.getFilterValue() as string) ?? ''}
+              value={
+                (table
+                  .getColumn('function')
+                  ?.getFilterValue() as string) ?? ''
+              }
               onChange={(event) =>
-                table.getColumn('function')?.setFilterValue(event.target.value)
+                table
+                  .getColumn('function')
+                  ?.setFilterValue(event.target.value)
               }
             />
 
@@ -356,7 +428,8 @@ const response = await fetch("https://lobaadmin-zohofunctionstogit.vercel.app/ap
                   .getAllColumns()
                   .filter(
                     (column) =>
-                      typeof column.accessorFn !== 'undefined' && column.getCanHide(),
+                      typeof column.accessorFn !== 'undefined' &&
+                      column.getCanHide(),
                   )
                   .map((column) => {
                     return (
@@ -364,7 +437,9 @@ const response = await fetch("https://lobaadmin-zohofunctionstogit.vercel.app/ap
                         key={column.id}
                         className="capitalize"
                         checked={column.getIsVisible()}
-                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
                       >
                         <span className="truncate">{column.id}</span>
                       </DropdownMenuCheckboxItem>
@@ -380,7 +455,10 @@ const response = await fetch("https://lobaadmin-zohofunctionstogit.vercel.app/ap
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
                       <TableHead key={header.id}>
-                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                       </TableHead>
                     ))}
                   </TableRow>
@@ -389,17 +467,33 @@ const response = await fetch("https://lobaadmin-zohofunctionstogit.vercel.app/ap
               <TableBody>
                 {table.getRowModel().rows.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id}>
+                    <TableRow
+                      key={row.id}
+                      className={cn(
+                        'transition-all duration-200',
+                        // recentItemIds.includes(row.original.id) &&
+                        //   'bg-black/10 dark:bg-white/20',
+                      )}
+                    >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell className="py-2 text-xs" key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        <TableCell
+                          className="py-2 text-xs"
+                          key={cell.id}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
                         </TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
                       No results.
                     </TableCell>
                   </TableRow>

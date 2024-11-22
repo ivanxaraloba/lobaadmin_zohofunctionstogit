@@ -51,10 +51,16 @@ export const arr = {
       const keyPath = key.split('.'); // Split the key path into parts
 
       // Get the value at the nested key path for object 'a'
-      const aValue = keyPath.reduce((obj, prop) => (obj ? obj[prop] : undefined), a);
+      const aValue = keyPath.reduce(
+        (obj, prop) => (obj ? obj[prop] : undefined),
+        a,
+      );
 
       // Get the value at the nested key path for object 'b'
-      const bValue = keyPath.reduce((obj, prop) => (obj ? obj[prop] : undefined), b);
+      const bValue = keyPath.reduce(
+        (obj, prop) => (obj ? obj[prop] : undefined),
+        b,
+      );
 
       // Compare values using localeCompare if they are strings, otherwise use subtraction for numbers
       if (typeof aValue === 'string' && typeof bValue === 'string') {
@@ -99,7 +105,9 @@ export const obj = {
 
         const filterMatches = caseSensitive
           ? item.value?.includes(filterString)
-          : item.value?.toLowerCase().includes(filterString.toLowerCase());
+          : item.value
+              ?.toLowerCase()
+              .includes(filterString.toLowerCase());
 
         if (nameMatches && (filterString === '' || filterMatches)) {
           result = item.value;
@@ -156,8 +164,8 @@ export const str = {
   },
   decodeHtmlSpecialChars: (str) => {
     const parser = new DOMParser();
-    const decodedString = parser.parseFromString(str, 'text/html').documentElement
-      .textContent;
+    const decodedString = parser.parseFromString(str, 'text/html')
+      .documentElement.textContent;
     return decodedString;
   },
   parseCURL: (curlStr) => {
@@ -207,11 +215,16 @@ export const time = {
     return result;
   },
   getTimestamptz: () => {
-    return formatInTimeZone(new Date(), 'Europe/Lisbon', "yyyy-MM-dd'T'HH:mm:ss");
+    return formatInTimeZone(
+      new Date(),
+      'Europe/Lisbon',
+      "yyyy-MM-dd'T'HH:mm:ss",
+    );
   },
   fixTime: (datetime) => {
     return new Date(datetime).setTime(
-      new Date(datetime).getTime() + new Date(datetime).getTimezoneOffset() * 60 * 1000,
+      new Date(datetime).getTime() +
+        new Date(datetime).getTimezoneOffset() * 60 * 1000,
     );
   },
 };
@@ -225,4 +238,12 @@ export const type = {
       return false;
     }
   },
+};
+
+export const debounce = (func, delay) => {
+  let timeoutId;
+  return function (...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(this, args), delay);
+  };
 };

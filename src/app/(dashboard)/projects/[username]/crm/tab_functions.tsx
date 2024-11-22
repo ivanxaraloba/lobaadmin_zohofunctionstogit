@@ -68,7 +68,11 @@ import {
 import { matchByWords } from '@/utils/filters';
 import { arr, time } from '@/utils/generic';
 
-export default function TabFunctions({ username }: { username: string }) {
+export default function TabFunctions({
+  username,
+}: {
+  username: string;
+}) {
   const PATH_TAB = 'crm/functions';
 
   const searchParams = useSearchParams();
@@ -79,15 +83,15 @@ export default function TabFunctions({ username }: { username: string }) {
     mutationFn: async () => {
       if (!project) throw new Error('Project data is not available.');
 
-      const { data: functions, error: errorGetFunctions } = await crmGetFunctions(
-        project.domain,
-        project.crm?.config,
-      );
+      const { data: functions, error: errorGetFunctions } =
+        await crmGetFunctions(project.domain, project.crm?.config);
 
       if (errorGetFunctions) throw errorGetFunctions;
       if (!functions?.length) return [];
 
-      const lastSync = project.crm?.lastSync ? time.fixTime(project.crm.lastSync) : null;
+      const lastSync = project.crm?.lastSync
+        ? time.fixTime(project.crm.lastSync)
+        : null;
 
       const filteredFunctions = lastSync
         ? functions.filter(
@@ -98,7 +102,9 @@ export default function TabFunctions({ username }: { username: string }) {
 
       if (!filteredFunctions.length) return [];
 
-      const toastId = toast.loading(`${filteredFunctions.length} functions to update...`);
+      const toastId = toast.loading(
+        `${filteredFunctions.length} functions to update...`,
+      );
       const functionsWithCode = (
         await Promise.all(
           filteredFunctions.map(async (functionInfo, index) => {
@@ -132,7 +138,8 @@ export default function TabFunctions({ username }: { username: string }) {
         })
         .eq('id', project.crm?.id);
 
-      if (error) throw new Error('Failed to update project functions');
+      if (error)
+        throw new Error('Failed to update project functions');
 
       return functionsWithCode;
     },
@@ -144,7 +151,9 @@ export default function TabFunctions({ username }: { username: string }) {
       toast.success('Functions updated successfully.');
     },
     onError: (err) => {
-      toast.error(err.message || 'Mutation failed. Please try again.');
+      toast.error(
+        err.message || 'Mutation failed. Please try again.',
+      );
     },
   });
 
@@ -190,7 +199,9 @@ export default function TabFunctions({ username }: { username: string }) {
       return {
         arr: data,
         obj: arr.groupInObj(data, 'functionId'),
-        pending: (data || []).filter((c: Commit) => c.status === 'pending'),
+        pending: (data || []).filter(
+          (c: Commit) => c.status === 'pending',
+        ),
       };
     },
   });
@@ -242,16 +253,24 @@ export default function TabFunctions({ username }: { username: string }) {
         key: 'tags',
         type: 'array',
         matchFn: (data: any, value: string[]) => {
-          if (value.includes('empty_function')) return !data.workflow?.length;
+          if (value.includes('empty_function'))
+            return !data.workflow?.length;
           const commits = queryCommits.data.obj[data.id] || [];
           if (value.includes('committed')) return commits?.length;
           if (value.includes('pending_commits'))
-            return !!commits.filter((c: Commit) => c.status === 'pending')?.length;
+            return !!commits.filter(
+              (c: Commit) => c.status === 'pending',
+            )?.length;
         },
       },
     ],
     searchMatchFn: (data: any, searchValue: string) => {
-      return matchByWords(data, searchValue, ['display_name', 'script'], searchMatches);
+      return matchByWords(
+        data,
+        searchValue,
+        ['display_name', 'script'],
+        searchMatches,
+      );
     },
   });
   const functions = arr.groupInArr(data, 'category');
@@ -267,28 +286,33 @@ export default function TabFunctions({ username }: { username: string }) {
           description={
             <>
               <AppTabDescription icon={Parentheses}>
-                A total of {project?.crm?.functions?.length || 0} functions
+                A total of {project?.crm?.functions?.length || 0}{' '}
+                functions
               </AppTabDescription>
               <AppTabDescription icon={RefreshCcw}>
-                Last sync occurred {time.timeAgo(project?.crm?.lastSync) || '-'}
+                Last sync occurred{' '}
+                {time.timeAgo(project?.crm?.lastSync) || '-'}
               </AppTabDescription>
-              {!!project?._repository && project?.departments?.id === DEPARMENTS.FTE && (
-                <AppTabDescription icon={ArrowUpFromLine}>
-                  Last commit occurred {time.timeAgo(project?.crm?.lastCommit) || '-'}
-                </AppTabDescription>
-              )}
-              {!!project?._repository && !!project?.crm?.lastCommit && (
-                <Description className="mt-4 flex items-center gap-2">
-                  <Link
-                    target="_blank"
-                    className="flex items-center gap-2"
-                    href={`https://bitbucket.org/lobadev/${project._repositoryName}/src/master/${PATH_TAB}`}
-                  >
-                    Open Bitbucket Repository
-                    <SquareArrowOutUpRight className="size-3" />
-                  </Link>
-                </Description>
-              )}
+              {!!project?._repository &&
+                project?.departments?.id === DEPARMENTS.FTE && (
+                  <AppTabDescription icon={ArrowUpFromLine}>
+                    Last commit occurred{' '}
+                    {time.timeAgo(project?.crm?.lastCommit) || '-'}
+                  </AppTabDescription>
+                )}
+              {!!project?._repository &&
+                !!project?.crm?.lastCommit && (
+                  <Description className="mt-4 flex items-center gap-2">
+                    <Link
+                      target="_blank"
+                      className="flex items-center gap-2"
+                      href={`https://bitbucket.org/lobadev/${project._repositoryName}/src/master/${PATH_TAB}`}
+                    >
+                      Open Bitbucket Repository
+                      <SquareArrowOutUpRight className="size-3" />
+                    </Link>
+                  </Description>
+                )}
             </>
           }
           right={
@@ -305,10 +329,12 @@ export default function TabFunctions({ username }: { username: string }) {
                       commit: commit,
                     }),
                   )}
-                  functions={project?.crm?.functions?.map((func: any) => ({
-                    folder: `${PATH_TAB}/${func.name}.dg`,
-                    script: func.workflow,
-                  }))}
+                  functions={project?.crm?.functions?.map(
+                    (func: any) => ({
+                      folder: `${PATH_TAB}/${func.name}.dg`,
+                      script: func.workflow,
+                    }),
+                  )}
                 />
               )}
               <ButtonLoading
@@ -342,7 +368,9 @@ export default function TabFunctions({ username }: { username: string }) {
                   <MultiSelect
                     defaultValue={filters.categories}
                     options={FUNCTIONS_CATEGORIES_LIST}
-                    onValueChange={(e: any) => setFilters({ categories: e })}
+                    onValueChange={(e: any) =>
+                      setFilters({ categories: e })
+                    }
                     placeholder="Select departments"
                     maxCount={3}
                   />
@@ -368,7 +396,9 @@ export default function TabFunctions({ username }: { username: string }) {
                         icon: ArrowUpFromLine,
                       },
                     ]}
-                    onValueChange={(e: any) => setFilters({ tags: e })}
+                    onValueChange={(e: any) =>
+                      setFilters({ tags: e })
+                    }
                     placeholder="Select tags"
                     maxCount={3}
                   />
@@ -385,43 +415,58 @@ export default function TabFunctions({ username }: { username: string }) {
                     activeFn ? 'col-span-1' : 'col-span-3',
                   )}
                 >
-                  {functions.map(({ label, items }: any, index: any) => {
-                    return (
-                      <Collapsible key={index} defaultOpen={true}>
-                        <CardContainer>
-                          <ListHeaderFunction
-                            label={
-                              FUNCTIONS_CATEGORIES_OBJ[
-                                label as keyof typeof FUNCTIONS_CATEGORIES_OBJ
-                              ]
-                            }
-                            length={items.length}
-                          />
-                          <CollapsibleContent className="mt-4">
-                            {items?.length > 0 && (
-                              <div className="flex flex-col gap-2">
-                                {items.map((functionInfo: CRMFunctions, i: number) => {
-                                  return (
-                                    <ListItemFunction
-                                      key={i}
-                                      activeFn={activeFn}
-                                      setActiveFn={setActiveFn}
-                                      functionInfo={functionInfo}
-                                      functionName={functionInfo.display_name}
-                                      functionCode={functionInfo.workflow}
-                                      functionId={functionInfo.id}
-                                      commitsObj={queryCommits.data.obj}
-                                      toCommit={isToCommit(functionInfo)}
-                                    />
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </CollapsibleContent>
-                        </CardContainer>
-                      </Collapsible>
-                    );
-                  })}
+                  {functions.map(
+                    ({ label, items }: any, index: any) => {
+                      return (
+                        <Collapsible key={index} defaultOpen={true}>
+                          <CardContainer>
+                            <ListHeaderFunction
+                              label={
+                                FUNCTIONS_CATEGORIES_OBJ[
+                                  label as keyof typeof FUNCTIONS_CATEGORIES_OBJ
+                                ]
+                              }
+                              length={items.length}
+                            />
+                            <CollapsibleContent className="mt-4">
+                              {items?.length > 0 && (
+                                <div className="flex flex-col gap-2">
+                                  {items.map(
+                                    (
+                                      functionInfo: CRMFunctions,
+                                      i: number,
+                                    ) => {
+                                      return (
+                                        <ListItemFunction
+                                          key={i}
+                                          activeFn={activeFn}
+                                          setActiveFn={setActiveFn}
+                                          functionInfo={functionInfo}
+                                          functionName={
+                                            functionInfo.display_name
+                                          }
+                                          functionCode={
+                                            functionInfo.workflow
+                                          }
+                                          functionId={functionInfo.id}
+                                          commitsObj={
+                                            queryCommits.data.obj
+                                          }
+                                          toCommit={isToCommit(
+                                            functionInfo,
+                                          )}
+                                        />
+                                      );
+                                    },
+                                  )}
+                                </div>
+                              )}
+                            </CollapsibleContent>
+                          </CardContainer>
+                        </Collapsible>
+                      );
+                    },
+                  )}
                 </div>
                 {/* Code */}
                 {activeFn && (
@@ -429,10 +474,15 @@ export default function TabFunctions({ username }: { username: string }) {
                     <div className="sticky top-0 flex w-full items-center justify-between border-b bg-primary-foreground pb-2 pt-4">
                       {/* Header */}
                       <div className="flex flex-col">
-                        <TypographyH3>{activeFn.display_name}</TypographyH3>
+                        <TypographyH3>
+                          {activeFn.display_name}
+                        </TypographyH3>
                         <Description>
                           Last modified date:{' '}
-                          {format(new Date(activeFn.modified_on), 'dd-MM-yyyy HH:mm:ss')}
+                          {format(
+                            new Date(activeFn.modified_on),
+                            'dd-MM-yyyy HH:mm:ss',
+                          )}
                         </Description>
                       </div>
                       {/* Buttons */}
@@ -443,10 +493,15 @@ export default function TabFunctions({ username }: { username: string }) {
                           functionInfo={activeFn}
                           path={PATH_TAB}
                           refetchCommits={queryCommits.refetch}
-                          className={cn(isToCommit(activeFn) && '!text-yellow-400')}
+                          className={cn(
+                            isToCommit(activeFn) &&
+                              '!text-yellow-400',
+                          )}
                         />
                         <ButtonCommitsHistory
-                          commits={queryCommits.data?.obj[activeFn.id]}
+                          commits={
+                            queryCommits.data?.obj[activeFn.id]
+                          }
                         />
                         <ButtonGenerateDoc
                           functionName={activeFn.display_name}
@@ -471,18 +526,27 @@ export default function TabFunctions({ username }: { username: string }) {
                       </div>
                     </div>
                     {/* Code */}
-                    <ScriptViewer className="mt-2 w-full" script={activeFn?.workflow} />
+                    <ScriptViewer
+                      className="mt-2 w-full"
+                      value={activeFn?.workflow}
+                    />
                   </CardContainer>
                 )}
               </AppTabContentBody>
             ) : (
               // Empty data with filters
-              <SectionMissing icon={SearchX} message="No matching functions found" />
+              <SectionMissing
+                icon={SearchX}
+                message="No matching functions found"
+              />
             )}
           </AppTabContent>
         ) : (
           <AppTabContentMissing>
-            <SectionMissing icon={Frown} message="No functions have been added yet" />
+            <SectionMissing
+              icon={Frown}
+              message="No functions have been added yet"
+            />
           </AppTabContentMissing>
         )}
       </>

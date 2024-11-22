@@ -2,7 +2,8 @@ export const NOTION_BITBUCKET_CREATE_PASSWORD_URL =
   'https://www.notion.so/arturloba/Bitbucket-Criar-Passwords-e2982ed9e03941a9a06a3926302686e7';
 
 export const BUCKETS = {
-  SETTINGS: 'https://iiacktsxpvhavtrfsfsr.supabase.co/storage/v1/object/public/settings',
+  SETTINGS:
+    'https://iiacktsxpvhavtrfsfsr.supabase.co/storage/v1/object/public/settings',
 };
 
 export const FUNCTIONS_CATEGORIES_LIST = [
@@ -39,8 +40,13 @@ export const DEPARMENTS = {
 export const LOGS_TYPES = ['success', 'error', 'warning', 'info'];
 
 export const LOGS_TYPES_COLORS = {
-  [LOGS_TYPES[0]]: '#4ade80',
-  [LOGS_TYPES[1]]: '#f87171',
-  [LOGS_TYPES[2]]: '#facc15',
-  [LOGS_TYPES[3]]: '#a1a1aa',
+  [LOGS_TYPES[0]]: '74, 222, 128',
+  [LOGS_TYPES[1]]: '248, 113, 113',
+  [LOGS_TYPES[2]]: '250, 204, 21',
+  [LOGS_TYPES[3]]: '161, 161, 170',
+};
+
+export const CONFIG_FUNCTION_VARIABLE = {
+  EXAMPLE: '[var:VARIABLE1]',
+  REGEX: /\[var:([A-Z0-9_]+)\]/g,
 };

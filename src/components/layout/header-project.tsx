@@ -42,7 +42,11 @@ export default function HeaderProject() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => router.push(`/projects?departments=${project?.departments.id}`)}
+        onClick={() =>
+          router.push(
+            `/projects?departments=${project?.departments.id}`,
+          )
+        }
       >
         {project?.departments?.name}
       </Button>
@@ -51,24 +55,15 @@ export default function HeaderProject() {
         size="sm"
         variant="ghost"
         className="w-fit"
-        items={projects.map((i) => ({ label: i.name, value: i.username }))}
+        items={projects.map((i) => ({
+          label: i.name,
+          value: i.username,
+        }))}
         value={project?.username}
-        onChange={(username: string) => router.push(`/projects/${username}`)}
+        onChange={(username: string) =>
+          router.push(`/projects/${username}`)
+        }
       />
-
-      <div className="ml-auto">
-        {/* search button */}
-        <DialogSearch>
-          <Button size="sm" variant="outline" className="w-[200px] justify-start">
-            <Search className="size-4" />
-            <span className="ml-2">Search</span>
-            <div className="ml-auto flex items-center gap-0.5">
-              <Command className="size-3" />
-              <span>K</span>
-            </div>
-          </Button>
-        </DialogSearch>
-      </div>
     </div>
   );
 }

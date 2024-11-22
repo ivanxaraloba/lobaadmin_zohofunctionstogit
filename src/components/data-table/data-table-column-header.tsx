@@ -1,25 +1,25 @@
+import { cn } from '@/lib/utils';
 import {
   ArrowDownIcon,
   ArrowUpIcon,
   CaretSortIcon,
   EyeNoneIcon,
-} from "@radix-ui/react-icons"
-import { type Column } from "@tanstack/react-table"
+} from '@radix-ui/react-icons';
+import { type Column } from '@tanstack/react-table';
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu';
 
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
-  column: Column<TData, TValue>
-  title: string
+  column: Column<TData, TValue>;
+  title: string;
 }
 
 export function DataTableColumnHeader<TData, TValue>({
@@ -28,32 +28,42 @@ export function DataTableColumnHeader<TData, TValue>({
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   if (!column.getCanSort() && !column.getCanHide()) {
-    return <div className={cn(className)}>{title}</div>
+    return <div className={cn(className)}>{title}</div>;
   }
 
   return (
-    <div className={cn("flex items-center space-x-2", className)}>
+    <div className={cn('flex items-center space-x-2', className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             aria-label={
-              column.getIsSorted() === "desc"
-                ? "Sorted descending. Click to sort ascending."
-                : column.getIsSorted() === "asc"
-                  ? "Sorted ascending. Click to sort descending."
-                  : "Not sorted. Click to sort ascending."
+              column.getIsSorted() === 'desc'
+                ? 'Sorted descending. Click to sort ascending.'
+                : column.getIsSorted() === 'asc'
+                  ? 'Sorted ascending. Click to sort descending.'
+                  : 'Not sorted. Click to sort ascending.'
             }
             variant="ghost"
             size="sm"
             className="-ml-3 h-8 data-[state=open]:bg-accent"
           >
             <span>{title}</span>
-            {column.getCanSort() && column.getIsSorted() === "desc" ? (
-              <ArrowDownIcon className="ml-2 size-4" aria-hidden="true" />
-            ) : column.getIsSorted() === "asc" ? (
-              <ArrowUpIcon className="ml-2 size-4" aria-hidden="true" />
+            {column.getCanSort() &&
+            column.getIsSorted() === 'desc' ? (
+              <ArrowDownIcon
+                className="ml-2 size-4"
+                aria-hidden="true"
+              />
+            ) : column.getIsSorted() === 'asc' ? (
+              <ArrowUpIcon
+                className="ml-2 size-4"
+                aria-hidden="true"
+              />
             ) : (
-              <CaretSortIcon className="ml-2 size-4" aria-hidden="true" />
+              <CaretSortIcon
+                className="ml-2 size-4"
+                aria-hidden="true"
+              />
             )}
           </Button>
         </DropdownMenuTrigger>
@@ -100,5 +110,5 @@ export function DataTableColumnHeader<TData, TValue>({
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  )
+  );
 }

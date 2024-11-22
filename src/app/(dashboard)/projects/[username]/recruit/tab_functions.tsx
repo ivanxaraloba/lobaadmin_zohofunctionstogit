@@ -486,7 +486,7 @@ export default function TabFunctions({ username }: { username: string }) {
                       </div>
                     </div>
                     {/* Code */}
-                    <ScriptViewer className="mt-2 w-full" script={activeFn?.workflow} />
+                    <ScriptViewer className="mt-2 w-full" value={activeFn?.workflow} />
                   </CardContainer>
                 )}
               </AppTabContentBody>

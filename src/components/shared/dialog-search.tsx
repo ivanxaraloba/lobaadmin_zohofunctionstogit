@@ -24,7 +24,7 @@ export default function DialogSearch({ children }: any) {
   const [open, setOpen] = useState(false);
   const [openCreateProject, setOpenCreateProject] = useState(false);
 
-  const { projects } = useGlobalStore();
+  const { projects, functions } = useGlobalStore();
   const router = useRouter();
 
   useHotkeys([['mod+K', () => setOpen((open) => !open)]]);
@@ -57,23 +57,62 @@ export default function DialogSearch({ children }: any) {
                 </div>
               </div>
             </CommandItem>
+            <CommandItem
+              onSelect={() => {
+                router.push('/functions/create');
+                setOpen(false);
+              }}
+            >
+              <div className="flex w-full flex-row items-center justify-between gap-y-2">
+                <div className="flex flex-col gap-0.5">
+                  <div className="flex flex-shrink items-center gap-2 truncate text-xs">
+                    <PlusCircle strokeWidth={1} className="size-4" />
+                    <p>New Function</p>
+                  </div>
+                </div>
+              </div>
+            </CommandItem>
           </CommandGroup>
           <CommandGroup heading="Projects">
             {projects.map((project: Project, index: number) => (
               <CommandItem
                 key={index}
-                onSelect={() => redirect(`/projects/${project.username}`)}
+                onSelect={() =>
+                  redirect(`/projects/${project.username}`)
+                }
               >
                 <div className="flex w-full flex-row items-center justify-between gap-y-2">
                   <div className="flex flex-col gap-0.5">
-                    <p className="flex-shrink truncate pr-4 text-xs">{project.name}</p>
+                    <p className="flex-shrink truncate pr-4 text-xs">
+                      {project.name}
+                    </p>
                   </div>
                   <div className="flex h-fit items-center gap-x-1.5">
-                    {!!project.crm && <BadgeApplication application="crm" />}
+                    {!!project.crm && (
+                      <BadgeApplication application="crm" />
+                    )}
                     {!!project.creator?.creatorApps?.length && (
                       <BadgeApplication application="creator" />
                     )}
-                    {!!project.recruit && <BadgeApplication application="recruit" />}
+                    {!!project.recruit && (
+                      <BadgeApplication application="recruit" />
+                    )}
+                  </div>
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+          <CommandGroup heading="Functions">
+            {functions.map((fn: any, index: number) => (
+              <CommandItem
+                key={index}
+                onSelect={() => redirect(`/functions/${fn.id}`)}
+              >
+                <div className="flex w-full flex-row items-center justify-between gap-y-2">
+                  <div className="flex flex-col gap-0.5">
+                    <p className="flex-shrink truncate pr-4 text-xs">
+                      {fn.name}
+                    </p>
                   </div>
                 </div>
               </CommandItem>
@@ -82,7 +121,10 @@ export default function DialogSearch({ children }: any) {
         </CommandList>
       </CommandDialog>
 
-      <DialogCreateProject open={openCreateProject} onOpenChange={setOpenCreateProject} />
+      <DialogCreateProject
+        open={openCreateProject}
+        onOpenChange={setOpenCreateProject}
+      />
     </>
   );
 }

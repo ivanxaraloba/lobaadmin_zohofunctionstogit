@@ -9,6 +9,8 @@ type GlobalState = {
   getProjects: () => Promise<any>;
   departments: Deparment[];
   getDepartments: () => Promise<void>;
+  functions: any[];
+  getFunctions: () => Promise<void>;
 };
 
 export const useGlobalStore = create<GlobalState>((set) => ({
@@ -40,19 +42,26 @@ export const useGlobalStore = create<GlobalState>((set) => ({
     try {
       const { data: projects, error } = await supabase
         .from('projects')
-        .select('*, departments(*), crm(id), creator(id, creatorApps(id)), recruit(id)')
+        .select(
+          '*, departments(*), crm(id), creator(id, creatorApps(id)), recruit(id)',
+        )
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       set({ projects: projects });
     } catch (error) {
-      console.error('Unexpected error while fetching projects:', error);
+      console.error(
+        'Unexpected error while fetching projects:',
+        error,
+      );
     }
   },
 
   departments: [],
   getDepartments: async () => {
-    const { data, error } = await supabase.from('departments').select('*');
+    const { data, error } = await supabase
+      .from('departments')
+      .select('*');
 
     if (error) {
       console.error('Error fetching departments info:', error);
@@ -62,5 +71,20 @@ export const useGlobalStore = create<GlobalState>((set) => ({
     if (data) {
       set({ departments: data });
     }
+  },
+
+  functions: [],
+  getFunctions: async () => {
+    const { data, error } = await supabase
+      .from('functions')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching functions info:', error);
+      return;
+    }
+
+    if (data) set({ functions: data });
   },
 }));

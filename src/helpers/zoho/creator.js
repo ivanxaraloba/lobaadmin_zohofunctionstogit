@@ -2,11 +2,13 @@
 
 import axios from 'axios';
 
-export const creatorGetAppStructure = async (domain, config, owner, name) => {
-  console.log(domain, config, owner, name);
+export const creatorGetAppStructure = async (
+  domain,
+  config,
+  owner,
+  name,
+) => {
   try {
-    if (!config?.cookie || !config['user-agent']) throw new Error('Config is missing');
-
     const response = await axios.get(
       `https://creator.zoho.${domain}/appbuilder/${owner}/${name}/fetchAccordian`,
       {
@@ -15,32 +17,38 @@ export const creatorGetAppStructure = async (domain, config, owner, name) => {
     );
 
     const functions = response.data;
-    const workflowMap = functions.workflows.workflowList.workflowList.reduce(
-      (map, workflow) => {
-        map[workflow.WFLinkName] = workflow;
-        return map;
+    const workflowMap =
+      functions.workflows.workflowList.workflowList.reduce(
+        (map, workflow) => {
+          map[workflow.WFLinkName] = workflow;
+          return map;
+        },
+        {},
+      );
+
+    const reportsGroupedByForm = functions.reports.reduce(
+      (acc, report) => {
+        if (!acc[report.fcn]) acc[report.fcn] = [];
+        acc[report.fcn].push(report);
+        return acc;
       },
       {},
     );
 
-    const reportsGroupedByForm = functions.reports.reduce((acc, report) => {
-      if (!acc[report.fcn]) acc[report.fcn] = [];
-      acc[report.fcn].push(report);
-      return acc;
-    }, {});
+    const formData = Object.keys(functions.formToReport).map(
+      (formName) => {
+        const reports = reportsGroupedByForm[formName] || [];
+        const workflows = (
+          functions.formToWorkflow[formName] || []
+        ).map((workflowName) => workflowMap[workflowName]);
 
-    const formData = Object.keys(functions.formToReport).map((formName) => {
-      const reports = reportsGroupedByForm[formName] || [];
-      const workflows = (functions.formToWorkflow[formName] || []).map(
-        (workflowName) => workflowMap[workflowName],
-      );
-
-      return {
-        name: formName,
-        reports,
-        workflows,
-      };
-    });
+        return {
+          name: formName,
+          reports,
+          workflows,
+        };
+      },
+    );
 
     return { data: formData, error: null };
   } catch (err) {
@@ -48,7 +56,13 @@ export const creatorGetAppStructure = async (domain, config, owner, name) => {
   }
 };
 
-export const creatorGetFunction = async (domain, config, owner, name, workflow) => {
+export const creatorGetFunction = async (
+  domain,
+  config,
+  owner,
+  name,
+  workflow,
+) => {
   const formData = new FormData();
 
   const extractToken = (str, key) => {
@@ -58,7 +72,10 @@ export const creatorGetFunction = async (domain, config, owner, name, workflow) 
   };
 
   formData.append('workflowLinkName', workflow);
-  formData.append('zccpn', extractToken(config.cookie, 'CSRF_TOKEN'));
+  formData.append(
+    'zccpn',
+    extractToken(config.cookie || config.Cookie, 'CSRF_TOKEN'),
+  );
 
   try {
     const response = await axios.post(

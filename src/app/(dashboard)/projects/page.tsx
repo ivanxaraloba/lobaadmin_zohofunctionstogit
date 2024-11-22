@@ -3,18 +3,29 @@
 import { useState } from 'react';
 
 import { PopoverClose } from '@radix-ui/react-popover';
-import { PlusIcon, SlidersHorizontal, X } from 'lucide-react';
+import {
+  CirclePlus,
+  PlusIcon,
+  SlidersHorizontal,
+  X,
+} from 'lucide-react';
+import Link from 'next/link';
 
 import CardProject from '@/components/shared/card-project';
 import DialogCreateProject from '@/components/shared/dialog-create-project';
 import PopoverFilters from '@/components/shared/popover-filters';
+import { TypographyH1 } from '@/components/typography/typography-h1';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import InputSearch from '@/components/ui/input-search';
 import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { useGlobalStore } from '@/stores/global';
 import { useFilters } from '@/hooks/use-filters';
 import { APPLICATIONS } from '@/utils/constants';
@@ -56,14 +67,17 @@ export default function Page() {
   });
 
   return (
-    <div>
-      <div className="flex items-center gap-3">
+    <div className="">
+      <div className="flex items-center gap-4 pb-10 text-xs">
+        <TypographyH1>Projects</TypographyH1>
         <DialogCreateProject open={open} onOpenChange={setOpen}>
-          <Button className="text-start">
-            <PlusIcon className="mr-2 size-4" />
+          <Button className="ml-auto text-start">
+            <CirclePlus className="size-4" />
             <span>New project</span>
           </Button>
         </DialogCreateProject>
+      </div>
+      <div className="flex items-center gap-3">
         <InputSearch
           placeholder="Search Project"
           value={search}
@@ -83,7 +97,9 @@ export default function Page() {
                 label: el.name,
                 value: el.id,
               }))}
-              onValueChange={(e: any) => setFilters({ departments: e })}
+              onValueChange={(e: any) =>
+                setFilters({ departments: e })
+              }
               placeholder="Select departments"
               maxCount={3}
             />
@@ -100,8 +116,10 @@ export default function Page() {
           </div>
         </PopoverFilters>
       </div>
-      <div className="my-6 space-y-4">
-        {data?.map((project, index) => <CardProject key={index} project={project} />)}
+      <div className="mt-4 space-y-4">
+        {data?.map((project, index) => (
+          <CardProject key={index} project={project} />
+        ))}
       </div>
     </div>
   );

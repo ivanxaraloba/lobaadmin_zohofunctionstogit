@@ -31,16 +31,18 @@ import {
 import { useGlobalStore } from '@/stores/global';
 import { useProjectStore } from '@/stores/project';
 import { BUCKETS } from '@/utils/constants';
-import { files, obj } from '@/utils/generic';
+import { files, obj, str } from '@/utils/generic';
 
 import { Button } from '../ui/button';
 import ButtonLoading from '../ui/button-loading';
 import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
+import DialogSettingsSteps from './dialog-settings-steps';
 import VideoPlayerSettings from './video-player-settings';
 
 const formSchema = z.object({
   owner: z.string().min(1),
-  file: z.instanceof(File),
+  curl: z.string().min(3),
 });
 
 export default function DialogSettingsCreator() {
@@ -52,28 +54,23 @@ export default function DialogSettingsCreator() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       owner: '',
-      file: undefined,
+      curl: '',
     },
   });
 
   const mutationUpdateSettings = useMutation({
-    mutationFn: async ({ owner, file }: { owner: string; file?: File }) => {
-      const content = await files.read(file);
-      const json = JSON.parse(content);
+    mutationFn: async ({
+      owner,
+      curl,
+    }: {
+      owner: string;
+      curl?: string;
+    }) => {
+      const config = str.parseCURL(curl);
 
-      let config = {
-        cookie: obj.findToken(json, 'Cookie', {
-          filterString: 'ZCBUILDERFIVE=true;',
-        }),
-        'user-agent': obj.findToken(json, 'user-agent'),
-      };
+      console.log(config);
 
-      // @ts-ignore
-      const missing = Object.keys(config).filter((key) => !config[key])[0];
-      if (missing)
-        throw new Error(`${missing} missing in the file`, {
-          cause: 'Clear cache or try getting the file from another page',
-        });
+      if (!Object.keys(config)?.length) throw Error('Invalid cURL');
 
       const { error } = await supabase.from('creator').upsert({
         id: project?.creator?.id,
@@ -106,7 +103,13 @@ export default function DialogSettingsCreator() {
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog
+        open={isOpen}
+        onOpenChange={() => {
+          form.setValue('curl', '');
+          setIsOpen(!isOpen);
+        }}
+      >
         <DialogTrigger asChild>
           <Button variant="ghost" size="icon">
             <Settings className="size-4" />
@@ -115,7 +118,6 @@ export default function DialogSettingsCreator() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Settings</DialogTitle>
-            <VideoPlayerSettings src={`${BUCKETS.SETTINGS}/settings_creator.mp4`} />
           </DialogHeader>
           <Form {...form}>
             <form
@@ -137,25 +139,21 @@ export default function DialogSettingsCreator() {
               />
               <FormField
                 control={form.control}
-                name="file"
+                name="curl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>File .Har</FormLabel>
+                    <FormLabel>cURL</FormLabel>
                     <FormControl>
-                      <Input
-                        type="file"
-                        accept=".har"
-                        onChange={(e) => {
-                          if (e.target.files?.[0]) {
-                            field.onChange(e.target.files[0]);
-                          }
-                        }}
+                      <Textarea
+                        {...field}
+                        className="textarea resize-none"
+                        placeholder="Paste your cURL here..."
                       />
                     </FormControl>
+
+                    <DialogSettingsSteps />
+
                     <FormMessage />
-                    <FormDescription>
-                      Retrieve the file from the Form Workflows list page
-                    </FormDescription>
                   </FormItem>
                 )}
               />

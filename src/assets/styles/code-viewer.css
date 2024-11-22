@@ -1,101 +1,13 @@
-pre[class*='language-'] {
-  background: none;
-  padding: 0;
-  margin: 0;
-  font-size: 12px;
+/* code mirror */
+
+.ͼo {
+  background-color: transparent !important;
 }
 
-code[class*='language-'],
-pre[class*='language-'] {
-  text-shadow: none;
-}
-
-/* Light mode */
-.deluge pre[class*='language-'],
-.deluge code[class*='language-'] {
-  color: #5e57b5;
-}
-
-/* Dark mode */
-html.dark .deluge pre[class*='language-'],
-html.dark .deluge code[class*='language-'] {
-  color: #b5c2ff;
-}
-
-/* Keywords */
-.deluge .token.keyword {
-  color: #c69060;
-}
-
-html.dark .deluge .token.keyword {
-  color: #f0c7a5;
-}
-
-/* Identifiers */
-.deluge .token.entity {
-  color: #5e57b5;
-}
-
-html.dark .deluge .token.entity {
-  color: #b5c2ff;
-}
-
-/* Functions */
-.deluge .token.function {
-  color: #c69060;
-}
-
-html.dark .deluge .token.function {
-  color: #f0c7a5;
-}
-
-/* Constants */
-.deluge .token.constant {
-  color: #5e57b5;
-}
-
-html.dark .deluge .token.constant {
-  color: #b5c2ff;
-}
-
-/* Strings */
-.deluge .token.string {
-  color: #d10000;
-}
-
-html.dark .deluge .token.string {
-  color: #ff8a8a;
-}
-
-/* Comments */
-.deluge .token.comment {
-  color: #9c9b96;
-}
-
-html.dark .deluge .token.comment {
-  color: #84817c;
-}
-
-/* Literals */
-.deluge .token.boolean,
-.deluge .token.number {
-  color: #c6607c;
-}
-
-html.dark .deluge .token.boolean,
-html.dark .deluge .token.number {
-  color: #ff99b3;
-}
-
-/* Operators */
-.deluge .token.operator,
-.deluge .token.punctuation {
-  color: #666666;
-  background: transparent !important;
-}
-
-html.dark .deluge .token.operator,
-html.dark .deluge .token.punctuation {
-  color: #cccccc;
-  background: transparent !important;
+.ͼ2 .cm-gutters,
+.ͼ1jy .cm-gutters,
+.ͼ3 .cm-gutters,
+.ͼo .cm-gutters,
+.ͼo {
+  background-color: transparent !important;
 }

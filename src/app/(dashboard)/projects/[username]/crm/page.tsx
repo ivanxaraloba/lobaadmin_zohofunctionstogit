@@ -26,7 +26,6 @@ import { toast } from 'sonner';
 
 import { ButtonNavTabs } from '@/components/layout/nav-tabs';
 import DialogSettingsCRM from '@/components/shared/dialog-settings-crm';
-import DialogSettingsCRM2 from '@/components/shared/dialog-settings-crm';
 import LoadingScreen from '@/components/shared/loading-screen';
 import CodeViewer from '@/components/shared/script-viewer';
 import ScriptViewer from '@/components/shared/script-viewer';
@@ -56,7 +55,11 @@ const TABS = [
   { id: 'clientscripts', label: 'Client Scripts' },
 ];
 
-export default function Page({ params }: { params: { username: string } }) {
+export default function Page({
+  params,
+}: {
+  params: { username: string };
+}) {
   const { username } = params;
   const { project } = useProjectStore();
   const [activeTab, setActiveTab] = useState<string>(TABS[0].id);
@@ -68,7 +71,7 @@ export default function Page({ params }: { params: { username: string } }) {
         <div className="flex items-center gap-4 pb-10 text-xs">
           <LogoCrm size={30} />
           <TypographyH1>Zoho CRM</TypographyH1>
-          <DialogSettingsCRM2 />
+          <DialogSettingsCRM />
         </div>
         {project && (
           <>
@@ -80,7 +83,9 @@ export default function Page({ params }: { params: { username: string } }) {
                   toggle={setActiveTab}
                   springy
                 />
-                {activeTab === 'functions' && <TabFunctions username={username} />}
+                {activeTab === 'functions' && (
+                  <TabFunctions username={username} />
+                )}
                 {activeTab === 'clientscripts' && (
                   <SectionMissing
                     icon={Angry}
