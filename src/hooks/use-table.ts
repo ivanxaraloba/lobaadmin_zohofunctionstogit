@@ -33,17 +33,16 @@ export function useTable({
 }) {
   const searchParams = useSearchParams();
 
-  // State variables with default values from options
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    options.columnVisibility || {},
+  const [columnVisibility, setColumnVisibility] =
+    useState<VisibilityState>(options.columnVisibility || {});
+  const [columnFilters, setColumnFilters] =
+    useState<ColumnFiltersState>(options.columnFilters || []);
+  const [rowSelection, setRowSelection] = useState<
+    Record<string, boolean>
+  >(options.rowSelection || {});
+  const [sorting, setSorting] = useState<SortingState>(
+    options.sorting || [],
   );
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    options.columnFilters || [],
-  );
-  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>(
-    options.rowSelection || {},
-  );
-  const [sorting, setSorting] = useState<SortingState>(options.sorting || []);
   const [pagination, setPagination] = useState(
     options.pagination || { pageIndex: 0, pageSize: 10 },
   );

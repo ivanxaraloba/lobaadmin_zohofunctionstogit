@@ -69,7 +69,6 @@ import {
 } from '@/components/ui/tooltip';
 import { useProjectStore } from '@/stores/project';
 import { useFilters } from '@/hooks/use-filters';
-import { useSearch } from '@/hooks/use-search';
 import { DEPARMENTS } from '@/utils/constants';
 import { matchByWords } from '@/utils/filters';
 import { arr, str, time } from '@/utils/generic';

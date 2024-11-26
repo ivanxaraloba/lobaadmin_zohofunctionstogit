@@ -1,6 +1,12 @@
 'use client';
 
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 interface ThemeContextType {
   theme: string;
@@ -14,7 +20,8 @@ const initialState: ThemeContextType = {
   toggleTheme: () => null,
 };
 
-export const ThemeProviderContext = createContext<ThemeContextType>(initialState);
+export const ThemeProviderContext =
+  createContext<ThemeContextType>(initialState);
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -25,7 +32,7 @@ interface ThemeProviderProps {
 export const ThemeProvider = ({
   children,
   defaultTheme = 'light',
-  storageKey = 'vite-ui-theme',
+  storageKey = 'theme',
 }: ThemeProviderProps) => {
   const [theme, setTheme] = useState<string>(defaultTheme);
 
@@ -54,7 +61,9 @@ export const ThemeProvider = ({
   };
 
   return (
-    <ThemeProviderContext.Provider value={{ theme, setTheme: changeTheme, toggleTheme }}>
+    <ThemeProviderContext.Provider
+      value={{ theme, setTheme: changeTheme, toggleTheme }}
+    >
       {children}
     </ThemeProviderContext.Provider>
   );

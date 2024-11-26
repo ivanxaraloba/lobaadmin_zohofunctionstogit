@@ -75,7 +75,6 @@ import {
 } from '@/components/ui/tooltip';
 import { useProjectStore } from '@/stores/project';
 import { useFilters } from '@/hooks/use-filters';
-import { useSearch } from '@/hooks/use-search';
 import {
   DEPARMENTS,
   FUNCTIONS_CATEGORIES_LIST,

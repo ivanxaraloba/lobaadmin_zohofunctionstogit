@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
@@ -19,6 +19,7 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { JsonViewer } from '@textea/json-viewer';
 import { format } from 'date-fns';
 import { ArrowUpDown, Check, Eye, Logs } from 'lucide-react';
@@ -61,7 +62,6 @@ import {
 import { useProjectStore } from '@/stores/project';
 import { LOGS_TYPES, LOGS_TYPES_COLORS } from '@/utils/constants';
 import { time, type } from '@/utils/generic';
-
 
 type ColumnDefExtended<TData = any> = ColumnDef<TData> & {
   title?: string;
@@ -247,6 +247,13 @@ export default function Page({
     },
   });
 
+  // const parentRef = useRef<any>();
+  // const rowVirtualizer = useVirtualizer({
+  //   count: 10000,
+  //   getScrollElement: () => parentRef.current,
+  //   estimateSize: () => 35,
+  // });
+
   const mutationDeleteLogs = useMutation({
     mutationFn: async (data: any) => {
       const { error } = await supabase
@@ -417,7 +424,7 @@ const response = await fetch("https://lobaadmin-zohofunctionstogit.vercel.app/ap
                   variant="outline"
                   className="ml-auto hidden lg:flex"
                 >
-                  <MixerHorizontalIcon className="mr-2 size-4" />
+                  <MixerHorizontalIcon className="size-4" />
                   View
                 </Button>
               </DropdownMenuTrigger>

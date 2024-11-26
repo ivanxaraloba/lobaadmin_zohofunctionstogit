@@ -44,7 +44,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { useGlobalStore } from '@/stores/global';
 import { useProjectStore } from '@/stores/project';
-import { useSearch } from '@/hooks/use-search';
 import { arr, str, time } from '@/utils/generic';
 import LogoCrm from '@/assets/img/logo-crm';
 
