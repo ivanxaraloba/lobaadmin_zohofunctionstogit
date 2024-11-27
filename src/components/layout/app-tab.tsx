@@ -17,8 +17,8 @@ export function AppTabHeader({ label, description, right }: any) {
 
 export function AppTabDescription({ icon: Icon, children }: any) {
   return (
-    <Description className="flex items-center gap-2">
-      <Icon className="size-3" />
+    <Description className="flex max-w-2xl items-center gap-2">
+      {Icon && <Icon className="size-3" />}
       {children}
     </Description>
   );
@@ -29,11 +29,15 @@ export function AppTabContent({ icon: Icon, children }: any) {
 }
 
 export function AppTabContentHead({ icon: Icon, children }: any) {
-  return <div className="flex w-full gap-4">{children}</div>;
+  return <div className="flex items-center w-full gap-4">{children}</div>;
 }
 
 export function AppTabContentBody({ icon: Icon, children }: any) {
-  return <div className="grid grid-cols-3 gap-x-10 rounded-2xl">{children}</div>;
+  return (
+    <div className="grid grid-cols-3 gap-x-10 rounded-2xl">
+      {children}
+    </div>
+  );
 }
 
 export function AppTabContentMissing({ icon: Icon, children }: any) {

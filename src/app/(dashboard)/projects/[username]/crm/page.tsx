@@ -47,11 +47,13 @@ import { useProjectStore } from '@/stores/project';
 import { arr, str, time } from '@/utils/generic';
 import LogoCrm from '@/assets/img/logo-crm';
 
+import TabClientScripts from './tab_bulkexecution';
 import TabFunctions from './tab_functions';
 
 const TABS = [
   { id: 'functions', label: 'Functions' },
-  { id: 'clientscripts', label: 'Client Scripts' },
+  { id: 'client_scripts', label: 'Client Scripts' },
+  { id: 'bulk_execution', label: 'Bulk Execution' },
 ];
 
 export default function Page({
@@ -85,12 +87,15 @@ export default function Page({
                 {activeTab === 'functions' && (
                   <TabFunctions username={username} />
                 )}
-                {activeTab === 'clientscripts' && (
+                {activeTab === 'client_scripts' && (
                   <SectionMissing
                     icon={Angry}
                     message="Espera um pouco ainda estou a fazer"
                     className="mt-10"
                   />
+                )}
+                {activeTab === 'bulk_execution' && (
+                  <TabClientScripts />
                 )}
               </div>
             ) : (

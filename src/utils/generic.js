@@ -247,3 +247,5 @@ export const debounce = (func, delay) => {
     timeoutId = setTimeout(() => func.apply(this, args), delay);
   };
 };
+
+export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

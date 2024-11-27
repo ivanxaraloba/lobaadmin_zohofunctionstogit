@@ -5,6 +5,8 @@ import React, { useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { ChevronLeft } from 'lucide-react';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -15,6 +17,7 @@ import LoadingScreen from '@/components/shared/loading-screen';
 import ScriptViewer from '@/components/shared/script-viewer';
 import { TypographyH1 } from '@/components/typography/typography-h1';
 import { TypographyH3 } from '@/components/typography/typography-h3';
+import { Button } from '@/components/ui/button';
 import ButtonLoading from '@/components/ui/button-loading';
 import {
   Form,
@@ -124,7 +127,12 @@ export default function EditFunctionPage() {
       {queryFunction.isPending && <LoadingScreen />}
       <div>
         <div className="flex items-center gap-4 pb-10 text-xs">
-          <TypographyH1>Edit Function</TypographyH1>
+          <TypographyH1 className="flex items-center gap-2">
+            <Link href="/functions">
+              <ChevronLeft className="size-4" />
+            </Link>
+            Edit Function
+          </TypographyH1>
         </div>
         <Form {...form}>
           <form
@@ -190,6 +198,9 @@ export default function EditFunctionPage() {
               </div>
             </CardContainer>
             <CardContainer className="flex items-center justify-end gap-4">
+              <Link href="/functions">
+                <Button variant="secondary">Cancel</Button>
+              </Link>
               <ButtonLoading
                 variant="destructive"
                 type="button"

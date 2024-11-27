@@ -84,3 +84,56 @@ export const crmGetConstants = async (domain, config) => {
     };
   }
 };
+
+export const crmTestFunction = async (
+  domain,
+  config,
+  timesToRun,
+  code,
+) => {
+  try {
+    const match = code.match(/(?:function\s+|(?:\w+\.)?)(\w+)\s*\(/);
+    const functionName = match[1];
+
+    const executionPromises = Array.from(
+      { length: timesToRun },
+      (_, index) => {
+        const execNumber = index + 1;
+        const modifiedCode = code.replace(
+          '[var:EXEC_NUMBER]',
+          execNumber.toString(),
+        );
+
+        const url = `https://crm.zoho.${domain}/crm/v7/settings/functions/${functionName}/actions/test`;
+        console.log(
+          `Executing: ${url} with execNumber: ${execNumber}`,
+        );
+
+        return axios.post(
+          url,
+          {
+            functions: [
+              {
+                script: modifiedCode,
+                arguments: {},
+              },
+            ],
+          },
+          { headers: config },
+        );
+      },
+    );
+
+    const responses = await Promise.all(executionPromises);
+
+    return {
+      data: responses,
+      error: null,
+    };
+  } catch (err) {
+    return {
+      data: null,
+      error: err?.response?.data || 'Internal error',
+    };
+  }
+};
