@@ -2,11 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 
-import {
-  crmGetConnections,
-  crmGetConstants,
-  crmGetFunctions,
-} from '@/helpers/zoho/crm';
+import { crmGetFunctions } from '@/helpers/zoho/crm';
 import { supabase } from '@/lib/supabase/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -38,15 +34,13 @@ import { str } from '@/utils/generic';
 
 import { Button } from '../ui/button';
 import ButtonLoading from '../ui/button-loading';
-import Description from '../ui/description';
 import { Textarea } from '../ui/textarea';
-import DialogSettingsSteps from './dialog-settings-steps';
 
 const formSchema = z.object({
   curl: z.string().min(3),
 });
 
-export default function DialogSettingsCRM() {
+export default function DialogSettingsCRM2() {
   const { project, getProject } = useProjectStore();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -58,24 +52,23 @@ export default function DialogSettingsCRM() {
     },
   });
 
-  const mutationUpdateConfig = useMutation({
+  const mutationCreateProject = useMutation({
     mutationFn: async ({ curl }: { curl: string }) => {
       const config = str.parseCURL(curl);
 
-      console.log(config);
+      // test api
+      const { error: errorTesting, data } = await crmGetFunctions(
+        project?.domain,
+        config,
+        { limit: 1 },
+      );
 
-      if (!Object.keys(config)?.length) throw Error('Invalid cURL');
-
-      const { data: connections, error: errorConnections } =
-        await crmGetConnections(project?.domain, config);
-
-      if (errorConnections) throw new Error(errorConnections);
+      if (errorTesting) throw errorTesting;
 
       const { error } = await supabase.from('crm').upsert({
         id: project?.crm?.id,
         projectId: project?.id,
         config,
-        connections,
       });
       if (error) throw error;
     },
@@ -91,7 +84,7 @@ export default function DialogSettingsCRM() {
   });
 
   const onSubmit = (data: any) => {
-    mutationUpdateConfig.mutate(data);
+    mutationCreateProject.mutate(data);
   };
 
   useEffect(() => {
@@ -131,12 +124,50 @@ export default function DialogSettingsCRM() {
                     <FormControl>
                       <Textarea
                         {...field}
-                        className="textarea resize-nonee"
+                        className="textarea resize-none"
                         placeholder="Paste your cURL here..."
                       />
                     </FormControl>
 
-                    <DialogSettingsSteps />
+                    <Dialog>
+                      <DialogTrigger className="w-fit">
+                        <FormDescription>
+                          Need help getting the cURL?{' '}
+                          <span className="underline underline-offset-2">
+                            Click here
+                          </span>
+                        </FormDescription>
+                      </DialogTrigger>
+                      <DialogContent className="!w-7/12 !max-w-full !border-none">
+                        <DialogTitle>
+                          Follow these steps to copy cURL
+                        </DialogTitle>
+                        <ol className="list-decimal space-y-1 pl-5 text-xs">
+                          <li>
+                            Open the browser’s{' '}
+                            <strong>Inspector</strong> and go to the{' '}
+                            <strong>Network</strong> tab.
+                          </li>
+                          <li>
+                            Right-click a request that fetches app
+                            data (look for one with cookies).
+                          </li>
+                          <li>
+                            Select <strong>Copy</strong>{' '}
+                            <strong>Copy as cURL</strong> (on Mac) or{' '}
+                            <strong>Copy as cURL (bash)</strong> (on
+                            Windows).
+                          </li>
+                        </ol>
+                        <Image
+                          alt="crm_settings_image"
+                          src={`${BUCKETS.SETTINGS}/settings_crm.png`}
+                          className="w-full"
+                          width={1000}
+                          height={500}
+                        />
+                      </DialogContent>
+                    </Dialog>
 
                     <FormMessage />
                   </FormItem>
@@ -145,7 +176,7 @@ export default function DialogSettingsCRM() {
               <ButtonLoading
                 className="w-full"
                 type="submit"
-                loading={mutationUpdateConfig.isPending}
+                loading={mutationCreateProject.isPending}
               >
                 Save Changes
               </ButtonLoading>

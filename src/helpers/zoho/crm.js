@@ -2,10 +2,15 @@
 
 import axios from 'axios';
 
-export const crmGetFunctions = async (domain, config) => {
+export const crmGetFunctions = async (
+  domain,
+  config,
+  options = { limit: 200 },
+) => {
   let functions = [];
   let offset = 0;
-  const limit = 200;
+  const limit = options.limit;
+  const crm_max_limit = 200;
 
   try {
     while (true) {
@@ -19,7 +24,7 @@ export const crmGetFunctions = async (domain, config) => {
       const fetchedFunctions = data?.functions ?? [];
       functions.push(...fetchedFunctions);
 
-      if (fetchedFunctions.length < limit) break;
+      if (fetchedFunctions.length < crm_max_limit) break;
       offset += limit;
     }
 
