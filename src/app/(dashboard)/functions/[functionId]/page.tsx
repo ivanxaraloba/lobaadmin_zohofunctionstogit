@@ -120,7 +120,7 @@ export default function EditFunctionPage() {
 
   useEffect(() => {
     form.reset({ ...queryFunction.data });
-  }, [queryFunction.isSuccess]);
+  }, [queryFunction.isSuccess,]);
 
   return (
     <>

@@ -59,6 +59,9 @@ export default function TabBulkExecution() {
         execTimes,
         code,
       );
+
+      console.log(data);
+
       if (error) throw error;
     },
     onSuccess: () => toast.success('Function executed successfully!'),
@@ -71,20 +74,7 @@ export default function TabBulkExecution() {
 
   return (
     <>
-      <AppTabHeader
-        label="Bulk Execution"
-        description={
-          <AppTabDescription>
-            Specify the number of executions using "Times to run".{' '}
-            <br />
-            Each run increments the variable EXEC_NUMBER by 1 for
-            dynamic tracking.
-            <br />
-            <br />
-            variable: [var:EXEC_NUMBER]
-          </AppTabDescription>
-        }
-      />
+      <AppTabHeader label="Bulk Execution" />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <AppTabContent>

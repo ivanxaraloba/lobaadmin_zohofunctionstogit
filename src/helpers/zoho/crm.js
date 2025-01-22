@@ -52,18 +52,30 @@ export const crmGetFunction = async (
 
 export const crmGetConnections = async (domain, config) => {
   try {
-    const url = `https://crm.zoho.${domain}/crm/v2/settings/connectors`;
-    const response = await axios.get(url, { headers: config });
+    const url = `https://crm.zoho.${domain}/deluge/api/ui/v1/${config['x-crm-org']}/services/ZohoCRM/connections?zuid=716124001&flowNeeded=true`;
+    const response = await axios.get(url, {
+      headers: {
+        ...config,
+        ['x-zcsrf-token']: config['x-zcsrf-token'].replace(
+          'crmcsrfparam',
+          'drepn',
+        ),
+      },
+    });
+
+    if (response.data.status === 'failure')
+      throw new Error(response.data.message);
+
     return {
-      data: response.data?.crm_connectors?.connection_list
-        ?.connections,
+      data: response.data?.connections,
       error: null,
     };
   } catch (err) {
-    console.log(err);
+    console.log(err.message);
+
     return {
       data: null,
-      error: err?.response?.data || 'Internal error',
+      error: err.message || 'Internal error',
     };
   }
 };
@@ -93,44 +105,43 @@ export const crmTestFunction = async (
 ) => {
   try {
     const match = code.match(/(?:function\s+|(?:\w+\.)?)(\w+)\s*\(/);
+    if (!match)
+      throw new Error(
+        'Function name could not be extracted from the code',
+      );
     const functionName = match[1];
+    const url = `https://crm.zoho.${domain}/crm/v7/settings/functions/${functionName}/actions/test`;
 
-    const executionPromises = Array.from(
+    const execNumbers = Array.from(
       { length: timesToRun },
-      (_, index) => {
-        const execNumber = index + 1;
-        const modifiedCode = code.replace(
-          '[var:EXEC_NUMBER]',
-          execNumber.toString(),
-        );
-
-        const url = `https://crm.zoho.${domain}/crm/v7/settings/functions/${functionName}/actions/test`;
-        console.log(
-          `Executing: ${url} with execNumber: ${execNumber}`,
-        );
-
-        return axios.post(
-          url,
-          {
-            functions: [
-              {
-                script: modifiedCode,
-                arguments: {},
-              },
-            ],
-          },
-          { headers: config },
-        );
-      },
+      (_, index) => index + 1,
     );
 
-    const responses = await Promise.all(executionPromises);
+    const result = {};
+    for (const index of execNumbers) {
+      const response = await axios.post(
+        url,
+        {
+          functions: [
+            {
+              script: code,
+              arguments: {},
+            },
+          ],
+        },
+        { headers: config },
+      );
+      console.log(index);
+
+      result[`execution_${index}`] = response.data?.functions[0];
+    }
 
     return {
-      data: responses,
+      data: result,
       error: null,
     };
   } catch (err) {
+    console.log(err?.response?.data || 'Internal error');
     return {
       data: null,
       error: err?.response?.data || 'Internal error',

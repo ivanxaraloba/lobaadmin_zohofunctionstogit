@@ -17,7 +17,11 @@ const helperGetAuth = async (): Promise<{
     throw new Error('User not found');
   }
 
-  const { data } = await supabase.from('users').select('*').eq('id', userId).single();
+  const { data } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', userId)
+    .single();
 
   return {
     username: data?.bbUsername || null,
@@ -29,7 +33,9 @@ interface ApiResponse<T> {
   data: T | null;
   error: any;
 }
-export const createRepository = async (name: string): Promise<ApiResponse<any>> => {
+export const createRepository = async (
+  name: string,
+): Promise<ApiResponse<any>> => {
   try {
     const response = await axios.post(
       `https://api.bitbucket.org/2.0/repositories/${workspace}/${name}`,
@@ -49,7 +55,11 @@ export const createRepository = async (name: string): Promise<ApiResponse<any>> 
   }
 };
 
-export const getRepository = async (name: string): Promise<ApiResponse<any>> => {
+export const getRepository = async (
+  name: string,
+): Promise<ApiResponse<any>> => {
+  console.log('getRepository', name);
+
   try {
     const response = await axios.get(
       `https://api.bitbucket.org/2.0/repositories/${workspace}/${name}`,
@@ -57,8 +67,12 @@ export const getRepository = async (name: string): Promise<ApiResponse<any>> => 
         auth: await helperGetAuth(),
       },
     );
+    console.log(response);
+
     return { data: response.data, error: null };
   } catch (err: any) {
+    console.log({ err });
+
     return { data: null, error: err.response?.data || err.message };
   }
 };

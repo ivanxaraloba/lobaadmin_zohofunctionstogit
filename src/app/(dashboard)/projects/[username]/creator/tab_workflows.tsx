@@ -449,7 +449,7 @@ export default function TabWorkflows({
                 {/* Code */}
                 {activeFn && (
                   <CardContainer className="sticky top-4 col-span-2 h-[calc(100vh-40px)] overflow-auto pt-0">
-                    <div className="sticky top-0 flex w-full items-center justify-between border-b bg-primary-foreground pb-2 pt-4">
+                    <div className="sticky top-0 flex w-full items-center justify-between border-b bg-primary-foreground pb-2 pt-4 z-10">
                       {/* Header */}
                       <div className="flex flex-col">
                         <TypographyH3>{activeFn.WFName}</TypographyH3>

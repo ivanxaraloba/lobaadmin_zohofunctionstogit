@@ -62,19 +62,14 @@ export default function DialogSettingsCRM() {
     mutationFn: async ({ curl }: { curl: string }) => {
       const config = str.parseCURL(curl);
 
+      console.log(config);
+
       if (!Object.keys(config)?.length) throw Error('Invalid cURL');
 
       const { data: connections, error: errorConnections } =
         await crmGetConnections(project?.domain, config);
 
-      const { data, error: eer } = await crmGetConstants(
-        project?.domain,
-        config,
-      );
-
-      console.log(data);
-
-      if (errorConnections) throw errorConnections;
+      if (errorConnections) throw new Error(errorConnections);
 
       const { error } = await supabase.from('crm').upsert({
         id: project?.crm?.id,
@@ -136,7 +131,7 @@ export default function DialogSettingsCRM() {
                     <FormControl>
                       <Textarea
                         {...field}
-                        className="textarea resize-none"
+                        className="textarea resize-nonee"
                         placeholder="Paste your cURL here..."
                       />
                     </FormControl>

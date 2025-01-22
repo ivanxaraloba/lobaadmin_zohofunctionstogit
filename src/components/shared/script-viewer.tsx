@@ -62,7 +62,7 @@ const hightlightHashtag = ViewPlugin.fromClass(
 );
 
 function ScriptViewer({
-  value = '',
+  value,
   onChange,
   className,
   editable = false,
@@ -112,7 +112,7 @@ function ScriptViewer({
         }}
         // onStatistics={(e) => console.log({ onStatistics: e })}
         className={cn('!border-none !outline-none', className)}
-        value={value}
+        value={value || ''}
         theme={theme === 'light' ? myTheme : monokai}
         extensions={[
           javascript({ jsx: true }),

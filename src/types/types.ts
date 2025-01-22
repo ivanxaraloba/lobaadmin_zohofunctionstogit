@@ -45,6 +45,7 @@ export interface Project {
     created_at: any;
     lastSync: string;
     lastCommit: string;
+    connections: Connection[];
     config: {};
   };
   creator?: {
@@ -178,3 +179,23 @@ export interface searchMatches {
   caseSensitive?: boolean;
   wholeWord?: boolean;
 }
+
+export type Connection = {
+  id: string;
+  name: string;
+  type: number;
+  scopes: string[];
+  isAdmin: boolean;
+  connector: {
+    logo: string;
+    name: string;
+    type: number;
+    displayName: string;
+  };
+  createdBy: string;
+  userAccess: boolean;
+  displayName: string;
+  isConnected: boolean;
+  isExtension: boolean;
+  isExternalClientEnabled: boolean;
+};

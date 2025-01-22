@@ -48,12 +48,14 @@ import { arr, str, time } from '@/utils/generic';
 import LogoCrm from '@/assets/img/logo-crm';
 
 import TabClientScripts from './tab_bulkexecution';
+import TabConnections from './tab_connections';
 import TabFunctions from './tab_functions';
 
 const TABS = [
   { id: 'functions', label: 'Functions' },
   { id: 'client_scripts', label: 'Client Scripts' },
   { id: 'bulk_execution', label: 'Bulk Execution' },
+  // { id: 'connections', label: 'Connections' },
 ];
 
 export default function Page({
@@ -97,6 +99,7 @@ export default function Page({
                 {activeTab === 'bulk_execution' && (
                   <TabClientScripts />
                 )}
+                {activeTab === 'connections' && <TabConnections />}
               </div>
             ) : (
               <SectionMissing

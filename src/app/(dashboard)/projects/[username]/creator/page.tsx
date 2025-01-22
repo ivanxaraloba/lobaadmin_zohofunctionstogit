@@ -2,7 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { creatorGetAppStructure, creatorGetFunction } from '@/helpers/zoho/creator';
+import {
+  creatorGetAppStructure,
+  creatorGetFunction,
+} from '@/helpers/zoho/creator';
 import { supabase } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import { creatorApp, Project } from '@/types/types';
@@ -56,7 +59,11 @@ const TABS = [
   { id: 'functions', label: 'Functions' },
 ];
 
-export default function Page({ params }: { params: { username: string } }) {
+export default function Page({
+  params,
+}: {
+  params: { username: string };
+}) {
   const { username } = params;
   const { user, getUser } = useGlobalStore();
   const { project, getProject } = useProjectStore();
@@ -67,7 +74,10 @@ export default function Page({ params }: { params: { username: string } }) {
     mutationFn: async (appId: any) => {
       if (!project) throw new Error('Project data is not available');
 
-      const { error } = await supabase.from('creatorApps').delete().eq('id', appId);
+      const { error } = await supabase
+        .from('creatorApps')
+        .delete()
+        .eq('id', appId);
       if (error) throw error;
     },
     onSuccess: async () => {
@@ -81,7 +91,8 @@ export default function Page({ params }: { params: { username: string } }) {
   });
 
   useEffect(() => {
-    if (project?.creator?.creatorApps?.length) setApp(project.creator.creatorApps[0]);
+    if (project?.creator?.creatorApps?.length)
+      setApp(project.creator.creatorApps[0]);
   }, [project?.id]);
 
   return (
@@ -100,25 +111,33 @@ export default function Page({ params }: { params: { username: string } }) {
                 <div className="flex items-center gap-2">
                   <DialogCreateCreatorApp />
                   {project?.creator?.creatorApps &&
-                    project?.creator?.creatorApps.map((item, index) => (
-                      <Button
-                        key={index}
-                        variant={app?.id === item.id ? 'default' : 'outline'}
-                        onClick={() => setApp(item)}
-                        size="sm"
-                        className="group relative gap-0 rounded-full px-6"
-                      >
-                        <span>{item.name}</span>
-                        <DialogConfirmation
-                          action={() => mutationDeleteApp.mutate(app?.id)}
-                          button={
-                            <div className="absolute -right-1.5 -top-1.5 hidden size-5 items-center justify-center rounded-full bg-destructive transition-all group-hover:flex">
-                              <X className="size-3 text-white" />
-                            </div>
+                    project?.creator?.creatorApps.map(
+                      (item, index) => (
+                        <Button
+                          key={index}
+                          variant={
+                            app?.id === item.id
+                              ? 'default'
+                              : 'outline'
                           }
-                        />
-                      </Button>
-                    ))}
+                          onClick={() => setApp(item)}
+                          size="sm"
+                          className="group relative gap-0 rounded-full px-6"
+                        >
+                          <span>{item.name}</span>
+                          <DialogConfirmation
+                            action={() =>
+                              mutationDeleteApp.mutate(app?.id)
+                            }
+                            button={
+                              <div className="absolute -right-1.5 -top-1.5 hidden size-5 items-center justify-center rounded-full bg-destructive transition-all group-hover:flex">
+                                <X className="size-3 text-white" />
+                              </div>
+                            }
+                          />
+                        </Button>
+                      ),
+                    )}
                 </div>
                 {app?.id && (
                   <div className="mt-10">
@@ -129,7 +148,11 @@ export default function Page({ params }: { params: { username: string } }) {
                       springy
                     />
                     {activeTab === 'workflows' && (
-                      <TabWorkflows username={username} app={app} setApp={setApp} />
+                      <TabWorkflows
+                        username={username}
+                        app={app}
+                        setApp={setApp}
+                      />
                     )}
                     {activeTab === 'functions' && (
                       <SectionMissing

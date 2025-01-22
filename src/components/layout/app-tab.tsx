@@ -8,8 +8,16 @@ export function AppTabHeader({ label, description, right }: any) {
     <div className="border-b py-10">
       <TypographyH2>{label}</TypographyH2>
       <div className="flex items-center">
-        <div className="mt-4 flex flex-col gap-2">{description}</div>
-        <div className="ml-auto flex items-center gap-3">{right}</div>
+        {description && (
+          <div className="mt-4 flex flex-col gap-2">
+            {description}
+          </div>
+        )}
+        {right && (
+          <div className="ml-auto flex items-center gap-3">
+            {right}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -29,7 +37,9 @@ export function AppTabContent({ icon: Icon, children }: any) {
 }
 
 export function AppTabContentHead({ icon: Icon, children }: any) {
-  return <div className="flex items-center w-full gap-4">{children}</div>;
+  return (
+    <div className="flex w-full items-center gap-4">{children}</div>
+  );
 }
 
 export function AppTabContentBody({ icon: Icon, children }: any) {
